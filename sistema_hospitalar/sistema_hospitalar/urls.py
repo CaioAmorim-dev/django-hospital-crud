@@ -14,5 +14,9 @@ urlpatterns = [
     path('medicos/editar/<int:id>/', views.editar_medico, name='editar_medico'),
     path('medicos/excluir/<int:id>/', views.excluir_medico, name='excluir_medico'),
 
-
+    # Consultas
+    path('consultas/', views.listar_consultas, name='listar_consultas'),
+    path('consultas/novo/', views.criar_consulta, name='criar_consulta'),
+    path('consultas/editar/<int:id>/', views.editar_consulta, name='editar_consulta'),
+    path('consultas/excluir/<int:id>/', views.excluir_consulta, name='excluir_consulta'),
 ]
