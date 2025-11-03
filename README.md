@@ -13,18 +13,17 @@ O projeto foi desenvolvido de forma colaborativa por uma equipe de seis integran
 
 ## Equipe
 
-Caio César Leandro Amorim
-
-Vinícius Pessoa de Albuquerque
-
-Wesley Yuri da Silva
-
-Miguel Victor Lussac Barboza
-
 Allan Max de Jesus Rodrigues de Lima
 
 Boniek Araújo dos Santos Júnior
 
+Caio César Leandro Amorim
+
+Miguel Victor Lussac Barboza
+
+Vinícius Pessoa de Albuquerque
+
+Wesley Yuri da Silva
 
 
 
