@@ -1,5 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Paciente
+from .models import Medico
+from .forms import MedicoForm
 
 # Create your views here.
 def home(request):
@@ -34,3 +36,7 @@ def excluir_pacientes(request, id):
         paciente.delete()
         return redirect('listar_pacientes')
     return render(request, 'pacientes/excluir.html', {'paciente': paciente})
+
+def listar_medico(request):
+    medicos = Medico.objects.all().order_by('nome')
+    return render(request, 'clinica/listar_medico.html', {'medicos': medicos})
