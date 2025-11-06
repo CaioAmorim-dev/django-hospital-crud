@@ -40,3 +40,14 @@ def excluir_pacientes(request, id):
 def listar_medico(request):
     medicos = Medico.objects.all().order_by('nome')
     return render(request, 'clinica/listar_medico.html', {'medicos': medicos})
+
+def criar_medico(request):
+    if request.method == 'POST':
+        form = MedicoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_medico')
+        
+    else:
+        form = MedicoForm()
+    return render(request, 'clinica/criar_medico.html', {'form': form})
