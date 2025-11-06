@@ -17,6 +17,10 @@ class MedicoForm(forms.ModelForm):
     class Meta:
         model = Medico
         fields = ['nome', 'numero']
+        widgets = {
+            'nome': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome do médico'}),
+            'numero': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Número de registro'}),
+        }
 
 
 class ConsultaForm(forms.ModelForm):
