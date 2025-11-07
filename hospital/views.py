@@ -66,3 +66,11 @@ def editar_medico(request, medico_id):
         'form':form,
         'medico': medico
     })
+
+def excluir_medico(request, medico_id):
+    medico = get_object_or_404(Medico, id=medico_id)
+    if request.method == 'POST':
+        medico.delete()
+        return redirect('lista_medico')
+    
+    return render(request, 'clinica/excluir_medico.html', {'medico': medico})
