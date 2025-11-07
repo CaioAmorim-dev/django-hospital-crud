@@ -40,7 +40,7 @@ def excluir_pacientes(request, id):
     if request.method == 'POST':
         paciente.delete()
         return redirect('listar_pacientes')
-    return render(request, 'pacientes/excluir.html', {'paciente': paciente})
+    return render(request, 'pacientes/excluir_pacientes.html', {'paciente': paciente})
 
 def listar_medico(request):
     medicos = Medico.objects.all().order_by('nome')
