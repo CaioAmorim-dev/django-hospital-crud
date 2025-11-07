@@ -51,3 +51,18 @@ def criar_medico(request):
     else:
         form = MedicoForm()
     return render(request, 'clinica/criar_medico.html', {'form': form})
+
+def editar_medico(request, medico_id):
+    medico = get_object_or_404(Medico, id=medico_id)
+    if request.method == 'POST':
+        form = MedicoForm(request.POST, instance=medico)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_medico')
+        
+    else:  
+        form = MedicoForm(instance=medico)
+    return render(request, 'clinica/editar_medico.html',{
+        'form':form,
+        'medico': medico
+    })
