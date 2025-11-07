@@ -24,15 +24,16 @@ def criar_pacientes(request):
         form = PacienteForm()
     return render(request, 'pacientes/cria_paciente.html', {"form": form})
 
-def editar_pacientes(resquest, id):
+def editar_pacientes(request, id):
     paciente = get_object_or_404(Paciente, id=id)
-    if resquest.method == 'POST':
-        paciente.nome = resquest.POST['nome']
-        paciente.idade = resquest.POST['idade']
-        paciente.contato = resquest.POST['contato']
-        paciente.save()
-        return redirect('listar_pacientes')
-    return render(resquest, 'pacientes/editar.html', {'paciente': paciente})
+    if request.method == 'POST':
+        form = PacienteForm(request.POST, instance=paciente)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_pacientes')
+    else: 
+        form = PacienteForm(instance=paciente)
+    return render(request, 'pacientes/editar_pacientes.html', {'form': form})
 
 def excluir_pacientes(request, id):
     paciente = get_object_or_404(Paciente, id=id)
