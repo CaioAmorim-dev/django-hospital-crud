@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Paciente
+from .forms import PacienteForm
 from .models import Medico
 from .forms import MedicoForm
 from .models import Consulta
@@ -15,12 +16,13 @@ def listar_pacientes(request):
 
 def criar_pacientes(request):
     if request.method == 'POST':
-        nome = request.POST['nome']
-        idade = request.POST['idade']
-        contato = request.POST['contato']
-        Paciente.objects.create(nome=nome, idade=idade, contato=contato)
-        return redirect('listar_pacientes')
-    return render(request, 'pacientes/criar.html')
+        form = ConsultaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_paciente')
+    else:
+        form = PacienteForm()
+    return render(request, 'pacientes/cria_paciente.html', {"form": form})
 
 def editar_pacientes(resquest, id):
     paciente = get_object_or_404(Paciente, id=id)
