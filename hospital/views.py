@@ -80,3 +80,13 @@ def excluir_medico(request, medico_id):
 def listar_consultas(request):
     consultas = Consulta.objects.all()
     return render(request, 'consultas/listar_consultas.html', {'consultas': consultas})
+
+def criar_consulta(request):
+    if request.method == 'POST':
+        form = ConsultaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_consultas')
+    else:
+        form = ConsultaForm()
+    return render(request, 'consultas/criar.html', {'form': form})
