@@ -101,3 +101,10 @@ def editar_consulta(request, id):
     else:
         form = ConsultaForm(instance=consulta)
     return render(request, 'consultas/editar_consulta.html', {'form': form})
+
+def excluir_consulta(request, id):
+    consulta = get_object_or_404(Consulta, id=id)
+    if request.method == 'POST':
+        consulta.delete()
+        return redirect('listar_consultas')
+    return render(request, 'consultas/excluir_consulta.html', {'consulta': consulta})
