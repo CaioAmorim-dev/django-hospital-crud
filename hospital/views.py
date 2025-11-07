@@ -12,7 +12,7 @@ def home(request):
 
 def listar_pacientes(request):
     pacientes = Paciente.objects.all()
-    return render(request, 'pacientes/listar.html', {'pacientes': pacientes})
+    return render(request, 'pacientes/listar_pacientes.html', {'pacientes': pacientes})
 
 def criar_pacientes(request):
     if request.method == 'POST':
