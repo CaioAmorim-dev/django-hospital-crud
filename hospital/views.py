@@ -90,3 +90,14 @@ def criar_consulta(request):
     else:
         form = ConsultaForm()
     return render(request, 'consultas/criar.html', {'form': form})
+
+def editar_consulta(request, id):
+    consulta = get_object_or_404(Consulta, id=id)
+    if request.method == 'POST':
+        form = ConsultaForm(request.POST, instance=consulta)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_consultas')
+    else:
+        form = ConsultaForm(instance=consulta)
+    return render(request, 'consultas/editar_consulta.html', {'form': form})
