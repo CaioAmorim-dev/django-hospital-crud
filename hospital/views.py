@@ -42,7 +42,7 @@ def excluir_pacientes(request, id):
         return redirect('listar_pacientes')
     return render(request, 'pacientes/excluir_pacientes.html', {'paciente': paciente})
 
-def listar_medico(request):
+def listar_medicos(request):
     medicos = Medico.objects.all().order_by('nome')
     return render(request, 'clinica/listar_medico.html', {'medicos': medicos})
 

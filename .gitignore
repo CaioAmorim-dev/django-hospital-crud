@@ -4,6 +4,7 @@ db.sqlite3
 # Pastas de cache compiladas
 __pycache__/
 */__pycache__/
+*.py[cod]
 
 # Arquivos de migração compilados (opcional, se quiser manter apenas os .py)
 *.pyc

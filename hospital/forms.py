@@ -4,7 +4,7 @@ from .models import Paciente, Medico, Consulta
 class PacienteForm(forms.ModelForm):
     class Meta:
         model = Paciente
-        fields = ["nome","idade", "contato", "situacao"]
+        fields = ["nome","idade", "contato"]
         widgets = {
             'nome': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Digite o nome do paciente'}),
             'idade': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Idade'}),
