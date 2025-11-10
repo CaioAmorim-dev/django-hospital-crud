@@ -8,7 +8,7 @@ from .forms import ConsultaForm
 
 # Create your views here.
 def home(request):
-    return render(request,"s /home.html")
+    return render(request,"home.html")
 
 def listar_pacientes(request):
     pacientes = Paciente.objects.all()
@@ -16,10 +16,10 @@ def listar_pacientes(request):
 
 def criar_pacientes(request):
     if request.method == 'POST':
-        form = ConsultaForm(request.POST)
+        form = PacienteForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('listar_paciente')
+            return redirect('listar_pacientes')
     else:
         form = PacienteForm()
     return render(request, 'pacientes/cria_paciente.html', {"form": form})
@@ -76,7 +76,7 @@ def excluir_medico(request, medico_id):
     medico = get_object_or_404(Medico, id=medico_id)
     if request.method == 'POST':
         medico.delete()
-        return redirect('lista_medico')
+        return redirect('listar_medico')
     
     return render(request, 'clinica/excluir_medico.html', {'medico': medico})
 
