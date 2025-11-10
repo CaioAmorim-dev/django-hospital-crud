@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastrar Paciente</title>
+</head>
+<body>
+    <center>
+        <h1>🧍‍♂️ Cadastro de Paciente</h1>
+        <hr width="60%">
+
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            <input type="submit" value="Salvar">
+            <input type="reset" value="Limpar">
+        </form>
+
+        <p><a href="{% url 'listar_pacientes' %}">↩️ Voltar à listagem</a></p>
+    </center>
+</body>
+</html>
