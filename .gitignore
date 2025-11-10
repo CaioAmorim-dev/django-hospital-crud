@@ -1,0 +1,30 @@
+# Arquivos de banco de dados
+db.sqlite3
+
+# Pastas de cache compiladas
+__pycache__/
+*/__pycache__/
+
+# Arquivos de migração compilados (opcional, se quiser manter apenas os .py)
+*.pyc
+
+# Ambiente virtual
+venv/
+.env/
+
+# Arquivos temporários de sistema
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.db
+
+# Configurações do VSCode, PyCharm e outros
+.vscode/
+.idea/
+
+# Arquivos do sistema operacional (Windows/macOS)
+.DS_Store
+Thumbs.db
