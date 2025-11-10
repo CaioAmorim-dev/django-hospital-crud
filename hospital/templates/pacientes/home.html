@@ -1,5 +1,5 @@
 <!-- arquivo destinado para pagina home do sistema de pacientes -->
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
@@ -9,7 +9,7 @@
     <center>
         <h1>🏥 Listagem de Pacientes</h1>
         <hr width="60%">
-        <p><a href="forms.html">➕ Novo Paciente</a></p>
+        <p><a href="{% url 'criar_paciente' %}">➕ Novo Paciente</a></p>
 
         <table border="1" cellpadding="8" cellspacing="0" width="60%">
             <tr bgcolor="#f2f2f2">
@@ -18,24 +18,22 @@
                 <th>Idade</th>
                 <th>Ações</th>
             </tr>
+
+            {% for paciente in pacientes %}
             <tr align="center">
-                <td>1</td>
-                <td>Maria Silva</td>
-                <td>35</td>
+                <td>{{ paciente.id }}</td>
+                <td>{{ paciente.nome }}</td>
+                <td>{{ paciente.idade }}</td>
                 <td>
-                    <a href="forms.html">Editar</a> |
-                    <a href="delete.html">Excluir</a>
+                    <a href="{% url 'editar_paciente' paciente.id %}">Editar</a> |
+                    <a href="{% url 'excluir_paciente' paciente.id %}">Excluir</a>
                 </td>
             </tr>
+            {% empty %}
             <tr align="center">
-                <td>2</td>
-                <td>João Pereira</td>
-                <td>42</td>
-                <td>
-                    <a href="forms.html">Editar</a> |
-                    <a href="delete.html">Excluir</a>
-                </td>
+                <td colspan="4">Nenhum paciente cadastrado.</td>
             </tr>
+            {% endfor %}
         </table>
 
         <p><a href="/">🏠 Voltar à página inicial</a></p>

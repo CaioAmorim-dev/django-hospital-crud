@@ -4,9 +4,9 @@ from . import views
 urlpatterns = [
     # Pacientes
     path('pacientes/', views.listar_pacientes, name='listar_pacientes'),
-    path('pacientes/novo/', views.criar_paciente, name='criar_paciente'),
-    path('pacientes/editar/<int:id>/', views.editar_paciente, name='editar_paciente'),
-    path('pacientes/excluir/<int:id>/', views.excluir_paciente, name='excluir_paciente'),
+    path('pacientes/novo/', views.criar_pacientes, name='criar_paciente'),
+    path('pacientes/editar/<int:id>/', views.editar_pacientes, name='editar_paciente'),
+    path('pacientes/excluir/<int:id>/', views.excluir_pacientes, name='excluir_paciente'),
 
     # Médicos
     path('medicos/', views.listar_medicos, name='listar_medicos'),
