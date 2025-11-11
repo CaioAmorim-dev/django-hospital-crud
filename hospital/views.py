@@ -8,7 +8,16 @@ from .forms import ConsultaForm
 
 # Create your views here.
 def home(request):
-    return render(request,"home.html")
+    return render(request, 'home.html')
+
+def pacientes_home(request):
+    return render(request, 'pacientes/home.html')
+
+def medicos_home(request):
+    return render(request, 'medicos/home.html')
+
+def consultas_home(request):
+    return render(request, 'consultas/home.html')
 
 def listar_pacientes(request):
     pacientes = Paciente.objects.all()
