@@ -1,8 +1,39 @@
 {% extends 'base.html' %}
 
 {% block title %}Início{% endblock %}
-
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 80px;
+        }
+        h1 {
+            margin-bottom: 40px;
+        }
+        .menu-btn {
+            display: inline-block;
+            padding: 15px 30px;
+            margin: 10px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 18px;
+        }
+        .menu-btn:hover {
+            background-color: #217dbb;
+        }
+    </style>
+</head>
 {% block content %}
 <h2>Bem-vindo ao Sistema Hospitalar</h2>
+
+<h1>🏥 Sistema Hospitalar</h1>
+
+    <a href="/medicos/" class="menu-btn">Médicos</a>
+    <a href="/pacientes/" class="menu-btn">Pacientes</a>
+    <a href="/consultas/" class="menu-btn">Consultas</a>
+
 <p>Use os links acima para navegar entre as seções.</p>
 {% endblock %}
