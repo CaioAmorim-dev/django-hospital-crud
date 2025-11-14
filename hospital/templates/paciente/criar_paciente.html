@@ -1,7 +1,9 @@
-<!DOCTYPE html>
-<html lang="pt-br">
+{% extends 'base.html %}
+
+{% block title %} Pacientes - Sistema Hospitalar {% endblock %}
+
+{% block content %}
 <head>
-    <meta charset="UTF-8">
     <title>Cadastrar Paciente</title>
 </head>
 <body>
@@ -20,4 +22,5 @@
         <p><a href="{% url 'listar_pacientes' %}">↩️ Voltar à listagem</a></p>
     </center>
 </body>
+{% endblock %}
 </html>

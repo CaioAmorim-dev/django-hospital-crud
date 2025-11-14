@@ -23,17 +23,19 @@
         }
         .menu-btn:hover {
             background-color: #217dbb;
+            transform: scale(1.08);
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
         }
     </style>
 </head>
 {% block content %}
 <h2>Bem-vindo ao Sistema Hospitalar</h2>
 
-<h1>🏥 Sistema Hospitalar</h1>
+<h1> Sistema Hospitalar</h1>
 
     <a href="/medicos/" class="menu-btn">Médicos</a>
     <a href="/pacientes/" class="menu-btn">Pacientes</a>
     <a href="/consultas/" class="menu-btn">Consultas</a>
 
-<p>Use os links acima para navegar entre as seções.</p>
+<p>Use os botões acima para navegar entre as seções.</p>
 {% endblock %}
