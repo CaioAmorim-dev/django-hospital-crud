@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Sistema Hospitalar{% endblock %}</title>
@@ -7,31 +8,79 @@
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            background-color: #f2f2f2;
+            padding: 20px;
+            background: #f2f2f2;
         }
+
         header {
             background-color: #007BFF;
             color: white;
             padding: 15px;
             text-align: center;
         }
+
         nav {
             background-color: #0056b3;
             padding: 10px;
             text-align: center;
         }
+
         nav a {
             color: white;
             margin: 0 15px;
             text-decoration: none;
             font-weight: bold;
         }
+
         nav a:hover {
             text-decoration: underline;
         }
+
         main {
             padding: 30px;
         }
+
+        form input {
+            width: 300px;
+            padding: 10px;
+            border: 2px solid #aaa;
+            border-radius: 20px;
+            font-size: 16px;
+            transition: .3s;
+        }
+
+        form input:focus {
+            border-color: #0078ff;
+            box-shadow: 0 0 6px rgba(0, 120, 255, 0.4);
+            outline: none;
+        }
+
+        form button {
+            padding: 10px 18px;
+            border-radius: 20px;
+            border: none;
+            background: #0078ff;
+            color: white;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        h3 {
+            margin-top: 25px;
+        }
+
+        ul {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            list-style: none;
+        }
+
+        li {
+            padding: 6px 0;
+            border-bottom: 1px solid #eee;
+        }
+
         footer {
             text-align: center;
             background-color: #007BFF;
@@ -41,9 +90,9 @@
             width: 100%;
             bottom: 0;
         }
-        
     </style>
 </head>
+
 <body>
     <header>
         <h1>Sistema Hospitalar</h1>
@@ -59,7 +108,36 @@
 
     <main>
         {% block content %}
-        
+        <h2>🔎 Buscar Pacientes e Médicos</h2>
+
+        <form method="GET">
+            <input type="text" name="q" placeholder="Nome, CPF, CRM, especialidade..." value="{{ termo }}">
+            <button type="submit">Buscar</button>
+        </form>
+
+        {% if termo %}
+        <h3>Pacientes encontrados</h3>
+        {% if pacientes %}
+        <ul>
+            {% for p in pacientes %}
+            <li>{{ p.nome }} — CPF: {{ p.cpf }}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>Nenhum paciente encontrado.</p>
+        {% endif %}
+
+        <h3>Médicos encontrados</h3>
+        {% if medicos %}
+        <ul>
+            {% for m in medicos %}
+            <li>{{ m.nome }} — CRM: {{ m.crm }} ({{ m.especialidade }})</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>Nenhum médico encontrado.</p>
+        {% endif %}
+        {% endif %}
         {% endblock %}
     </main>
 
@@ -67,4 +145,5 @@
         <p>&copy; 2025 - Sistema Hospitalar</p>
     </footer>
 </body>
+
 </html>
