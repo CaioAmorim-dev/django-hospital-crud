@@ -5,6 +5,7 @@ from .models import Medico
 from .forms import MedicoForm
 from .models import Consulta
 from .forms import ConsultaForm
+from django.db.models import Q
 
 # Create your views here.
 def home(request):
@@ -18,6 +19,28 @@ def medicos_home(request):
 
 def consultas_home(request):
     return render(request, 'consultas/home.html')
+
+def buscar(request):
+    termo = request.GET.get('q', '')
+
+    pacientes = Paciente.objects.filter(
+        Q(nome__icontains=termo) |
+        Q(cpf__icontains=termo) |
+        Q(telefone__icontains=termo)
+    ) if termo else []
+
+    medicos = Medico.objects.filter(
+        Q(nome__icontains=termo) |
+        Q(especialidade__icontains=termo) |
+        Q(crm__icontains=termo)
+    ) if termo else []
+
+    contexto = {
+        'termo': termo,
+        'pacientes': pacientes,
+        'medicos': medicos,
+    }
+    return render(request, 'buscar.html', contexto)
 
 def listar_pacientes(request):
     pacientes = Paciente.objects.all()
