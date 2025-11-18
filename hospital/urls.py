@@ -15,7 +15,7 @@ urlpatterns = [
 
 
     #MEDICO 
-    path('medico/', views.medico_home, name='medico_home'),
+    path('medico/', views.home_medico, name='medico_home'),
 
     path('medico/novo/', views.criar_medico, name='criar_medico'),
     path('medico/editar/<int:medico_id>/', views.editar_medico, name='editar_medico'),
