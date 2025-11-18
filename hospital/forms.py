@@ -6,12 +6,12 @@ import re
 class PacienteForm(forms.ModelForm):
     class Meta:
         model = Paciente
-        fields = ["nome","idade", "contato", "CPF"]
+        fields = ["nome","idade", "contato", "cpf"]
         widgets = {
             'nome': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Digite o nome do paciente'}),
             'idade': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Idade'}),
             'contato': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Telefone ou e-mail'}),
-            'CPF': forms.TextInputInput(attrs={'class': 'form-control', 'placeholder': 'Digite o CPF do paciente'}),
+            'cpf': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Digite o CPF do paciente'}),
             }
         
     def clean_idade(self):
@@ -64,11 +64,11 @@ class PacienteForm(forms.ModelForm):
 class MedicoForm(forms.ModelForm):
     class Meta:
         model = Medico
-        fields = ['nome', 'numero']
+        fields = ['nome', 'numero', 'cpf']
         widgets = {
             'nome': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome do médico'}),
             'numero': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Número de registro'}),
-            'CPF': forms.TextInputInput(attrs={'class': 'form-control', 'placeholder': 'Digite o CPF do paciente'}),
+            'cpf': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Digite o CPF do médico'}),
         }
 
     def clean_numero(self):
@@ -77,8 +77,8 @@ class MedicoForm(forms.ModelForm):
         if not numero:
             raise ValidationError("Número é obrigatório.")
 
-        if not re.fullmatch(r'\d{8,15}', str(numero)):
-            raise ValidationError("Número inválido. Digite apenas números (8 a 15 dígitos).")
+        if not re.fullmatch(r'\d{4,10}', str(numero)):
+            raise ValidationError("Número inválido. Digite apenas números (4 a 10 dígitos).")
 
         if Medico.objects.filter(numero=numero).exclude(id=self.instance.id).exists():
             raise ValidationError("Este número já está cadastrado para outro médico.")
@@ -89,21 +89,17 @@ class MedicoForm(forms.ModelForm):
         cpf = self.cleaned_data.get("cpf")
 
         if not cpf:
-             raise ValidationError("Erro! Digite o CPF novamente!")
-           
+            raise ValidationError("CPF é obrigatório.")
 
         cpf_digits = re.sub(r'\D', '', str(cpf))
 
         if len(cpf_digits) != 11:
             raise ValidationError("CPF inválido. Deve conter 11 dígitos.")
 
-
-        if Paciente.objects.filter(cpf=cpf_digits).exclude(id=self.instance.id).exists():
-            raise ValidationError("Este CPF já está cadastrado.")
+        if Medico.objects.filter(cpf=cpf_digits).exclude(id=self.instance.id).exists():
+            raise ValidationError("Este CPF já está cadastrado para outro médico.")
 
         return cpf_digits
-
-
 
 
 class ConsultaForm(forms.ModelForm):
@@ -118,11 +114,11 @@ class ConsultaForm(forms.ModelForm):
         }
 
     def clean_data(self):
-        from datetime import datetime
+        from django.utils import timezone
 
         data = self.cleaned_data.get("data")
 
-        if data and data < datetime.now():
+        if data and data < timezone.now():
             raise ValidationError("A data da consulta não pode ser no passado.")
 
         return data
