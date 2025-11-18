@@ -1,4 +1,4 @@
-{% extends 'base.html %}
+{% extends 'base.html' %}
 
 {% block title %} Pacientes - Sistema Hospitalar {% endblock %}
 
@@ -19,7 +19,7 @@
             <input type="reset" value="Limpar">
         </form>
 
-        <p><a href="{% url 'listar_pacientes' %}">↩️ Voltar à listagem</a></p>
+        <p><a href="{% url 'paciente_home' %}">Voltar à listagem</a></p>
     </center>
 </body>
 {% endblock %}
