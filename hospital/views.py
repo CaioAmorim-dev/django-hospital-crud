@@ -72,7 +72,7 @@ def excluir_paciente(request, id):
 
 # MEDICO 
 
-def medico_home(request):
+def home_medico(request):
     termo = request.GET.get('q', '')
 
     medicos = Medico.objects.all().order_by('nome')
