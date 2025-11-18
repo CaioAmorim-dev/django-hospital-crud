@@ -25,9 +25,9 @@ class Consulta(models.Model):
         ('CA', 'Cancelada'),
     ]
 
-    paciente = models.ForeignKey('Paciente', on_delete=models.CASCADE)
-    medico = models.ForeignKey('Medico', on_delete=models.CASCADE)
-    data = models.DateTimeField()
+    paciente = models.ForeignKey('Paciente', on_delete=models.CASCADE, related_name='consultas')
+    medico = models.ForeignKey('Medico', on_delete=models.CASCADE, related_name='consultas')
+    data = models.DateTimeField(db_index=True)
     situacao = models.CharField(max_length=2, choices=STATUS_CHOICES, default='AG')
 
     def __str__(self):
