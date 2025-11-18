@@ -7,7 +7,7 @@ urlpatterns = [
     path('', views.home, name='home'),
 
     #PACIENTE 
-    path('paciente/', views.paciente_home, name='paciente_home'),
+    path('paciente/', views.home_paciente, name='paciente_home'),
 
     path('paciente/novo/', views.criar_paciente, name='criar_paciente'),
     path('paciente/editar/<int:id>/', views.editar_paciente, name='editar_paciente'),

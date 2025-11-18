@@ -13,7 +13,7 @@ def home(request):
 
 # PACIENTE 
 
-def paciente_home(request):
+def home_paciente(request):
     termo = request.GET.get('q', '')
 
     pacientes = Paciente.objects.all()
