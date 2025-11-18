@@ -3,28 +3,29 @@ from . import views
 
 urlpatterns = [
 
-    path("", views.buscar, name="buscar"),
-    
-    # Pacientes
+    # Página inicial do sistema
     path('', views.home, name='home'),
 
-    path('pacientes/', views.pacientes_home, name='pacientes_home'),
-    path('pacientes/listar', views.listar_pacientes, name='listar_pacientes'),
-    path('pacientes/novo/', views.criar_pacientes, name='criar_paciente'),
-    path('pacientes/editar/<int:id>/', views.editar_pacientes, name='editar_paciente'),
-    path('pacientes/excluir/<int:id>/', views.excluir_pacientes, name='excluir_paciente'),
+    #PACIENTE 
+    path('paciente/', views.paciente_home, name='paciente_home'),
 
-    # Médicos
-    path('medicos/', views.medicos_home, name='medicos_home'),
-    path('medicos/listar', views.listar_medicos, name='listar_medicos'),
-    path('medicos/novo/', views.criar_medico, name='criar_medico'),
-    path('medicos/editar/<int:id>/', views.editar_medico, name='editar_medico'),
-    path('medicos/excluir/<int:id>/', views.excluir_medico, name='excluir_medico'),
+    path('paciente/novo/', views.criar_paciente, name='criar_paciente'),
+    path('paciente/editar/<int:id>/', views.editar_paciente, name='editar_paciente'),
+    path('paciente/excluir/<int:id>/', views.excluir_paciente, name='excluir_paciente'),
 
-    # Consultas
-    path('consultas/', views.consultas_home, name='consultas_home'),
-    path('consultas/listar', views.listar_consultas, name='listar_consultas'),
-    path('consultas/novo/', views.criar_consulta, name='criar_consulta'),
-    path('consultas/editar/<int:id>/', views.editar_consulta, name='editar_consulta'),
-    path('consultas/excluir/<int:id>/', views.excluir_consulta, name='excluir_consulta'),
+
+    #MEDICO 
+    path('medico/', views.medico_home, name='medico_home'),
+
+    path('medico/novo/', views.criar_medico, name='criar_medico'),
+    path('medico/editar/<int:medico_id>/', views.editar_medico, name='editar_medico'),
+    path('medico/excluir/<int:medico_id>/', views.excluir_medico, name='excluir_medico'),
+
+
+    #CONSULTA 
+    path('consulta/', views.consulta_home, name='consulta_home'),
+
+    path('consulta/novo/', views.criar_consulta, name='criar_consulta'),
+    path('consulta/editar/<int:id>/', views.editar_consulta, name='editar_consulta'),
+    path('consulta/excluir/<int:id>/', views.excluir_consulta, name='excluir_consulta'),
 ]
