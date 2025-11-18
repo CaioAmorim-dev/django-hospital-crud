@@ -34,3 +34,35 @@ Caio César Leandro Amorim
 ## Tema
 
 Sistema hospitalar
+
+
+### Orientações para rodar projeto
+
+**Criar ambiente virtual**
+```
+python -m venv venv
+```
+**Acessar ambiente virutal**
+```
+venv\Scripts\activate
+```
+**instalar django**
+```
+pip install django
+```
+**Fazer migrations**
+```
+python manage.py makemigrations
+```
+**Aplicar migrations**
+```
+python manage.py migrate
+```
+**Rodar o servidor**
+```
+python manage.py runserver
+```
+**Acessar servidor no navegador**
+```
+👉 http://127.0.0.1:8000
+```
