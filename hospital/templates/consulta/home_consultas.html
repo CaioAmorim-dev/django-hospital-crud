@@ -1,43 +1,45 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Listagem de Consultas</title>
-</head>
-<body>
-    <center>
-        <h1>📋 Listagem de Consultas</h1>
-        <hr width="60%">
-        <p><a href="{% url 'criar_consulta' %}">➕ Nova Consulta</a></p>
+{% extends 'base.html' %}
 
-        <table border="1" cellpadding="8" cellspacing="0" width="70%">
-            <tr bgcolor="#f2f2f2">
-                <th>ID</th>
-                <th>Paciente</th>
-                <th>Médico</th>
-                <th>Data</th>
-                <th>Ações</th>
-            </tr>
+{% block title %} Consultas - Sistema Hospitalar {% endblock %}
 
-            {% for consulta in consultas %}
-            <tr align="center">
-                <td>{{ consulta.id }}</td>
-                <td>{{ consulta.paciente.nome }}</td>
-                <td>{{ consulta.medico.nome }}</td>
-                <td>{{ consulta.data }}</td>
-                <td>
-                    <a href="{% url 'editar_consulta' consulta.id %}">Editar</a> |
-                    <a href="{% url 'excluir_consulta' consulta.id %}">Excluir</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr align="center">
-                <td colspan="5">Nenhuma consulta cadastrada.</td>
-            </tr>
-            {% endfor %}
-        </table>
+{% block content %}
 
-        <p><a href="/">🏠 Voltar à página inicial</a></p>
-    </center>
-</body>
-</html>
+<div style="text-align: center;">
+
+    <h2>📋 Listagem de Consultas</h2>
+    <p>Aqui você pode visualizar todas as consultas cadastradas.</p>
+
+    <p><a href="{% url 'criar_consulta' %}">➕ Nova Consulta</a></p>
+
+    <table border="1" cellpadding="8" cellspacing="0" width="70%" style="margin: 0 auto;">
+        <tr bgcolor="#f2f2f2">
+            <th>ID</th>
+            <th>Paciente</th>
+            <th>Médico</th>
+            <th>Data</th>
+            <th>Ações</th>
+        </tr>
+
+        {% for consulta in consulta %}
+        <tr align="center">
+            <td>{{ consulta.id }}</td>
+            <td>{{ consulta.paciente.nome }}</td>
+            <td>{{ consulta.medico.nome }}</td>
+            <td>{{ consulta.data }}</td>
+            <td>
+                <a href="{% url 'editar_consulta' consulta.id %}">✏️ Editar</a> |
+                <a href="{% url 'excluir_consulta' consulta.id %}">❌ Excluir</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr align="center">
+            <td colspan="5">Nenhuma consulta cadastrada.</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <p><a href="/">🏠 Voltar à página inicial</a></p>
+
+</div>
+
+{% endblock %}

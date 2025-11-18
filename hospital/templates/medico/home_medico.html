@@ -1,43 +1,39 @@
-<!-- arquivo destinado para pagina home do sistema de medicos -->
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Listagem de Médicos</title>
-</head>
-<body>
-    <center>
-        <h1>⚕️ Listagem de Médicos</h1>
-        <hr width="60%">
-        
-        <p><a href="{% url 'criar_medico' %}">➕ Novo Médico</a></p>
+{% extends 'base.html' %}
 
-        <table border="1" cellpadding="8" cellspacing="0" width="60%">
-            <tr bgcolor="#f2f2f2">
-                <th>ID</th>
-                <th>Nome</th>
-                <th>Especialidade</th>
-                <th>Ações</th>
-            </tr>
+{% block title %} Lista de Médicos - Sistema Hospitalar {% endblock %}
 
-            {% for medico in medicos %}
-            <tr align="center">
-                <td>{{ medico.id }}</td>
-                <td>{{ medico.nome }}</td>
-                <td>{{ medico.especialidade }}</td>
-                <td>
-                    <a href="{% url 'editar_medico' medico.id %}">Editar</a> |
-                    <a href="{% url 'excluir_medico' medico.id %}">Excluir</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr align="center">
-                <td colspan="4">Nenhum médico cadastrado.</td>
-            </tr>
-            {% endfor %}
-        </table>
+{% block content %}
+<center>
+    <h1>⚕️ Listagem de Médicos</h1>
+    <hr width="60%">
+    
+    <p><a href="{% url 'criar_medico' %}">➕ Novo Médico</a></p>
 
-        <p><a href="/">🏠 Voltar à página inicial</a></p>
-    </center>
-</body>
-</html>
+    <table border="1" cellpadding="8" cellspacing="0" width="60%">
+        <tr bgcolor="#f2f2f2">
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Especialidade</th>
+            <th>Ações</th>
+        </tr>
+
+        {% for m in medico %}
+        <tr align="center">
+            <td>{{ m.id }}</td>
+            <td>{{ m.nome }}</td>
+            <td>{{ m.especialidade }}</td>
+            <td>
+                <a href="{% url 'editar_medico' m.id %}">Editar</a> |
+                <a href="{% url 'excluir_medico' m.id %}">Excluir</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr align="center">
+            <td colspan="4">Nenhum médico cadastrado.</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <p><a href="/">🏠 Voltar à página inicial</a></p>
+</center>
+{% endblock %}

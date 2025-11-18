@@ -158,7 +158,7 @@ def consulta_home(request):
             Q(medico__nome__icontains=termo)
         )
 
-    return render(request, 'consulta/home_consulta.html', {
+    return render(request, 'consulta/home_consultas.html', {
         'termo': termo,
         'consultas': consultas
     })
