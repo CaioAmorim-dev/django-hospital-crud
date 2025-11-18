@@ -1,5 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
+from django.utils import timezone
+from .models import Paciente, Medico, Consulta
 
 from .models import Paciente, Medico, Consulta
 from .forms import PacienteForm, MedicoForm, ConsultaForm
@@ -8,7 +10,20 @@ from .forms import PacienteForm, MedicoForm, ConsultaForm
 # HOME DO SISTEMA 
 
 def home(request):
-    return render(request, 'home.html')
+    hoje= timezone.now().date()
+    agora = timezone.now()
+
+    contexto = {
+        "total_pacientes" : Paciente.objects.count(),
+        "total_medicos" : Medico.objects.count(),
+        "total_consultas" : Consulta.objects.count(),
+        "consultas_hoje": Consulta.objects.filter(data__date=hoje).count(),
+        "consulta_mes" : Consulta.objects.filter(data__year=agora.year, data__month=agora.month).count(),
+        "proximas_consultas" : Consulta.objects.filter(data__gte=agora).order_by('data')[:5],
+        }
+    
+
+    return render(request, 'home.html', contexto)
 
 
 # PACIENTE 
