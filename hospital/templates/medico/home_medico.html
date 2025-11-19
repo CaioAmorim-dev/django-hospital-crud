@@ -1,39 +1,95 @@
 {% extends 'base.html' %}
 
-{% block title %} Lista de Médicos - Sistema Hospitalar {% endblock %}
+{% block title %} Médicos - Sistema Hospitalar {% endblock %}
 
 {% block content %}
-<center>
-    <h1>⚕️ Listagem de Médicos</h1>
-    <hr width="60%">
-    
-    <p><a href="{% url 'criar_medico' %}">➕ Novo Médico</a></p>
+<h2>Área do Médico</h2>
+<p>Bem-vindo à área do médico. Aqui você pode visualizar e gerenciar informações dos médicos.</p>
 
-    <table border="1" cellpadding="8" cellspacing="0" width="60%">
-        <tr bgcolor="#f2f2f2">
-            <th>ID</th>
-            <th>Nome</th>
-            <th>Especialidade</th>
-            <th>Ações</th>
-        </tr>
+    <!-- BOTÃO DE CRIAR PACIENTE -->
+    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#modalCriarPaciente">
+    Criar Médico
+    </button>
 
-        {% for m in medico %}
-        <tr align="center">
-            <td>{{ m.id }}</td>
-            <td>{{ m.nome }}</td>
-            <td>{{ m.especialidade }}</td>
-            <td>
-                <a href="{% url 'editar_medico' m.id %}">Editar</a> |
-                <a href="{% url 'excluir_medico' m.id %}">Excluir</a>
-            </td>
-        </tr>
-        {% empty %}
-        <tr align="center">
-            <td colspan="4">Nenhum médico cadastrado.</td>
-        </tr>
-        {% endfor %}
-    </table>
 
-    <p><a href="/">🏠 Voltar à página inicial</a></p>
-</center>
+    <!-- TABELA DE PACIENTES -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Especialidades</th>
+                        <th>CPF</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for medico in medico %}
+                    <tr>
+                        <td>{{ medico.id }}</td>
+                        <td>{{ medico.nome }}</td>
+                        <td>{{ medico.especialidades }}</td>
+                        <td>{{ paciente.cpf}}</td>
+                            <a href="{% url 'editar_medico' medico.id %}" class="btn btn-warning btn-sm">Editar</a>
+                            <a href="{% url 'excluir_medico' medico.id %}" class="btn btn-danger btn-sm">Excluir</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center">
+                            Nenhum médico cadastrado.
+                        </td>
+                    </tr>
+
+                    <!-- Modal Criar Paciente -->
+                    <div class="modal fade" id="modalCriarPaciente" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+
+                        <div class="modal-header">
+                            <h5 class="modal-title">Cadastrar Médico</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <form method="POST" action="{% url 'criar_paciente' %}">
+                            {% csrf_token %}
+                            
+                            <div class="modal-body">
+
+                            <div class="mb-3">
+                                <label class="form-label">Nome:</label>
+                                <input type="text" name="nome" class="form-control" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Especialidades:</label>
+                                <input type="number" name="idade" class="form-control" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">CPF:</label>
+                                <input type="text" name="email" class="form-control" required>
+                            </div>
+
+                            </div>
+
+                            <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-success">Salvar</button>
+                            </div>
+
+                        </form>
+
+                        </div>
+                    </div>
+                    </div>
+
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
 {% endblock %}
