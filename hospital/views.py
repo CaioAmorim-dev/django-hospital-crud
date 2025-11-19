@@ -149,12 +149,28 @@ def excluir_medico(request, medico_id):
 def consulta_home(request):
     # nova função
     termo = request.GET.get('q', '')
+    data_inicio = request.GET.get('data_inicio', '')
+    data_fim = request.GET.get('data_fim', '')
+
     consultas = Consulta.objects.all()
-    form = ConsultaForm()  # <-- IMPORTANTE
+    
+    if termo:
+        consultas = consultas.filter(
+            Q(paciente__nome__icontains=termo) |
+            Q(medico__nome__icontains=termo) |
+            Q(data__icontains=termo)
+        )
+
+    if data_inicio:
+        consultas = consultas.filter(data__date__gte=data_inicio)
+    if data_fim:
+        consultas = consultas.filter(data__date__lte=data_fim)
+
     return render(request, 'consulta/home_consultas.html', {
         'termo': termo,
-        'consultas': consultas,
-        'form': form
+        'data_inicio': data_inicio,
+        'data_fim': data_fim,
+        'consultas': consultas
     })
 
 def criar_consulta(request):

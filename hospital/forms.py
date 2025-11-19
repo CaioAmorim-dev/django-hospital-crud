@@ -1,30 +1,21 @@
-from django import forms 
+from django import forms
 from django.core.exceptions import ValidationError
 from .models import Paciente, Medico, Consulta
 import re
+from datetime import date
+
 
 class PacienteForm(forms.ModelForm):
     class Meta:
         model = Paciente
-        fields = ["nome","idade", "contato", "cpf"]
+        # PACIENTE TEM: nome, idade, contato, cpf, data_nascimento
+        fields = ["nome", "contato", "cpf", "data_nascimento"]
         widgets = {
             'nome': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Digite o nome do paciente'}),
-            'idade': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Idade'}),
             'contato': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Telefone ou e-mail'}),
             'cpf': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Digite o CPF do paciente'}),
-            }
-        
-    def clean_idade(self):
-        idade = self.cleaned_data. get("idade")
-
-        if idade is None:
-         raise ValidationError("Idade é obrigatória.")
-        
-        if idade < 0:
-         raise ValidationError("A idade não pode ser negativa. Tente novamente!")
-        return idade
-    
-    
+            'data_nascimento': forms.DateInput(attrs={'type': 'date', 'class': 'form-control', 'placeholder': 'Data de nascimento'}),
+        }
 
     def clean_contato(self):
         contato = self.cleaned_data.get("contato")
@@ -32,9 +23,11 @@ class PacienteForm(forms.ModelForm):
         if not contato:
             raise ValidationError("Contato é obrigatório.")
 
+        # só aceita dígitos, de 8 a 15
         if not re.fullmatch(r'\d{8,15}', str(contato)):
             raise ValidationError("Telefone inválido. Digite apenas números (8 a 15 dígitos).")
 
+        # valida duplicidade de contato
         if Paciente.objects.filter(contato=contato).exclude(id=self.instance.id).exists():
             raise ValidationError("Este telefone já está cadastrado para outro paciente.")
 
@@ -44,46 +37,64 @@ class PacienteForm(forms.ModelForm):
         cpf = self.cleaned_data.get("cpf")
 
         if not cpf:
-             raise ValidationError("Erro! Digite o CPF novamente!")
-           
+            raise ValidationError("Erro! Digite o CPF novamente!")
 
         cpf_digits = re.sub(r'\D', '', str(cpf))
 
         if len(cpf_digits) != 11:
             raise ValidationError("CPF inválido. Deve conter 11 dígitos.")
 
-
         if Paciente.objects.filter(cpf=cpf_digits).exclude(id=self.instance.id).exists():
             raise ValidationError("Este CPF já está cadastrado.")
 
         return cpf_digits
 
+    def clean_data_nascimento(self):
+        data_nascimento = self.cleaned_data.get("data_nascimento")
+        if data_nascimento > date.today():
+            raise ValidationError("A data de nascimento não pode ser no futuro.")
+        return data_nascimento
 
-            
+
 
 class MedicoForm(forms.ModelForm):
     class Meta:
         model = Medico
-        fields = ['nome', 'numero', 'cpf']
+        # MODELO TEM: nome, especialidade, crm, cpf
+        fields = ['nome', 'especialidade', 'crm', 'cpf']
         widgets = {
-            'nome': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome do médico'}),
-            'numero': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Número de registro'}),
-            'cpf': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Digite o CPF do médico'}),
+            'nome': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nome do médico'
+            }),
+            'especialidade': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Especialidade'
+            }),
+            'crm': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'CRM do médico'
+            }),
+            'cpf': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Digite o CPF do médico'
+            }),
         }
 
-    def clean_numero(self):
-        numero = self.cleaned_data.get("numero")
+    def clean_crm(self):
+        crm = self.cleaned_data.get("crm")
 
-        if not numero:
-            raise ValidationError("Número é obrigatório.")
+        if not crm:
+            raise ValidationError("CRM é obrigatório.")
 
-        if not re.fullmatch(r'\d{4,10}', str(numero)):
-            raise ValidationError("Número inválido. Digite apenas números (4 a 10 dígitos).")
+        # exemplo simples: só dígitos e letras, mínimo 4 caracteres
+        if not re.fullmatch(r'[A-Za-z0-9]{4,20}', str(crm)):
+            raise ValidationError("CRM inválido. Use de 4 a 20 caracteres, letras e números.")
 
-        if Medico.objects.filter(numero=numero).exclude(id=self.instance.id).exists():
-            raise ValidationError("Este número já está cadastrado para outro médico.")
+        if Medico.objects.filter(crm=crm).exclude(id=self.instance.id).exists():
+            raise ValidationError("Este CRM já está cadastrado para outro médico.")
 
-        return numero
+        return crm
 
     def clean_cpf(self):
         cpf = self.cleaned_data.get("cpf")
@@ -109,7 +120,10 @@ class ConsultaForm(forms.ModelForm):
         widgets = {
             'paciente': forms.Select(attrs={'class': 'form-select'}),
             'medico': forms.Select(attrs={'class': 'form-select'}),
-            'data': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
+            'data': forms.DateTimeInput(attrs={
+                'class': 'form-control',
+                'type': 'datetime-local'
+            }),
             'situacao': forms.Select(attrs={'class': 'form-select'}),
         }
 

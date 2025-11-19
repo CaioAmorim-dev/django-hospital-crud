@@ -1,33 +1,42 @@
 from django.contrib import admin
-from .models import Paciente
+from .models import Paciente, Medico, Consulta
 from django import forms
 from django.forms import DateInput
 
-# FILTRO PACIENTE
-class PacienteForm(forms.ModelForm):
-    class Meta:
-        model = Paciente
-        fields = ['nome', 'cpf', 'data_nascimento']
-
-    # Customiza o campo de data para exibir o formato DD/MM/AAAA
-    data_nascimento = forms.DateField(
-        widget=DateInput(attrs={
-            'type': 'date',  # Isso garante que o navegador exiba o seletor de data
-            'class': 'form-control',  # Estilo do campo
-            'placeholder': 'DD/MM/AAAA'  # Placeholder para o formato
-        })
-    )
-
+# Filtro para Paciente
 class PacienteAdmin(admin.ModelAdmin):
-    form = PacienteForm
-    list_display = ('nome', 'cpf', 'data_nascimento')  # Adiciona o campo de data de nascimento à lista
-    search_fields = ('nome', 'cpf', )  # Permite pesquisar por nome, cpf e contato
-
+    list_display = ('nome', 'cpf', 'data_nascimento')
+    search_fields = ('nome', 'cpf')
+    list_filter = ('data_nascimento',)  # Filtro por data de nascimento
     fieldsets = (
         (None, {
-            'fields': ('nome', 'cpf', 'data_nascimento')  # Campos do formulário de cadastro
+            'fields': ('nome', 'cpf', 'data_nascimento')
         }),
     )
 
-# Registra o modelo Paciente com a customização
+# Filtro para Médico
+class MedicoAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'cpf', 'especialidade', 'crm')
+    search_fields = ('nome', 'cpf', 'especialidade', 'crm')
+    list_filter = ('especialidade', 'crm')  # Filtro por especialidade e CRM
+    fieldsets = (
+        (None, {
+            'fields': ('nome', 'cpf', 'especialidade', 'crm')
+        }),
+    )
+
+# Filtro para Consulta
+class ConsultaAdmin(admin.ModelAdmin):
+    list_display = ('paciente', 'medico', 'data', 'situacao')
+    search_fields = ('paciente__nome', 'medico__nome')
+    list_filter = ('data', 'paciente', 'medico', 'situacao')  # Filtro por data, paciente, médico e situação
+    fieldsets = (
+        (None, {
+            'fields': ('paciente', 'medico', 'data', 'situacao')
+        }),
+    )
+
+# Registrando os modelos no admin
 admin.site.register(Paciente, PacienteAdmin)
+admin.site.register(Medico, MedicoAdmin)
+admin.site.register(Consulta, ConsultaAdmin)

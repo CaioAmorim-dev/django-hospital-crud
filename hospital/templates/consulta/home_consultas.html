@@ -12,6 +12,28 @@
     Criar Consulta
 </button>
 
+<!-- FORMULÁRIO DE FILTRO -->
+<form method="get">
+    <input type="text" name="q" placeholder="Pesquisar por Paciente, Medico, Data..." value="{{ termo }}" class="form-control mb-3">
+
+    <!-- Filtro de Intervalo de Data -->
+ 
+    <div class="row mb-3">
+        <div class="col">
+            <label for="data_inicio">Data Início:</label>
+            <input type="date" name="data_inicio" value="{{ data_inicio }}" class="form-control" placeholder="Data Início">
+        </div>
+        <div class="col">
+            <label for="data_fim">Data Fim:</label>
+            <input type="date" name="data_fim" value="{{ data_fim }}" class="form-control" placeholder="Data Fim">
+        </div>
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Filtrar</button>
+</form>
+
+<hr>
+
 <!-- TABELA DE CONSULTAS -->
 <div class="card shadow-sm">
     <div class="card-body">
@@ -56,7 +78,7 @@
 
                         {% if consulta.situacao != "CA" %}
                         <button class="btn btn-danger btn-sm"
-                                onclick="abrirModalCancelar({{ consulta.id }})">
+                                onclick="abrirModalCancelar('{{ consulta.id }}')">
                             Cancelar
                         </button>
                         {% endif %}
