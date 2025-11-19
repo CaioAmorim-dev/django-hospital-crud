@@ -199,3 +199,43 @@ def cancelar_consulta(request, id):
 
     return redirect("consulta_home")
 
+# FILTRO PACIENTE
+
+def home_paciente(request):
+    termo = request.GET.get('q', '')  # Termo de pesquisa geral
+    data_nascimento_inicio = request.GET.get('data_nascimento_inicio', '')
+    data_nascimento_fim = request.GET.get('data_nascimento_fim', '')
+    contato = request.GET.get('contato', '')
+
+    # Inicia a consulta, buscando todos os pacientes
+    pacientes = Paciente.objects.all()
+
+    # Filtro por nome, CPF e telefone
+    if termo:
+        pacientes = pacientes.filter(
+            Q(nome__icontains=termo) |
+            Q(cpf__icontains=termo) |
+            Q(contato__icontains=termo)
+        )
+
+    # Filtro por data de nascimento (intervalo)
+    if data_nascimento_inicio:
+        pacientes = pacientes.filter(data_nascimento__gte=data_nascimento_inicio)
+    if data_nascimento_fim:
+        pacientes = pacientes.filter(data_nascimento__lte=data_nascimento_fim)
+
+    # Filtro por contato (telefone ou e-mail)
+    if contato:
+        pacientes = pacientes.filter(contato__icontains=contato)
+
+    # Passando o filtro de termo e a lista de pacientes para o Template
+    return render(request, 'paciente/home_paciente.html', {
+        'termo': termo,
+        'data_nascimento_inicio': data_nascimento_inicio,
+        'data_nascimento_fim': data_nascimento_fim,
+        'contato': contato,
+        'pacientes': pacientes
+    })
+
+
+

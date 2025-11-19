@@ -6,90 +6,105 @@
 <h2>Área do Paciente</h2>
 <p>Bem-vindo à área do paciente. Aqui você pode visualizar e gerenciar suas informações médicas.</p>
 
-    <!-- BOTÃO DE CRIAR PACIENTE -->
-    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#modalCriarPaciente">
+<!-- BOTÃO DE CRIAR PACIENTE -->
+<button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#modalCriarPaciente">
     Criar Paciente
-    </button>
+</button>
 
+<!-- FILTRO PACIENTE -->
+<form method="get">
+    <!-- Campo de pesquisa por Nome, CPF, Telefone -->
+    <input type="text" name="q" placeholder="Pesquisar por nome, CPF, etc." value="{{ termo }}" class="form-control mb-3">
 
-    <!-- TABELA DE PACIENTES -->
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <table class="table table-striped">
-                <thead>
+    <!-- Filtros adicionais -->
+    <div class="row mb-3">
+        <div class="col">
+            <input type="date" name="data_nascimento" value="{{ data_nascimento }}" class="form-control" placeholder="Data Nascimento">
+        </div>
+        
+    </div>
+
+    <button type="submit" class="btn btn-primary">Filtrar</button>
+</form>
+
+<hr>
+
+<!-- TABELA DE PACIENTES -->
+<div class="card shadow-sm">
+    <div class="card-body">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Idade</th>
+                    <th>CPF</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for paciente in pacientes %}
                     <tr>
-                        <th>ID</th>
-                        <th>Nome</th>
-                        <th>Idade</th>
-                        <th>CPF</th>
-
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for paciente in paciente %}
-                    <tr>
+                        <td>{{ paciente.id }}</td>
                         <td>{{ paciente.nome }}</td>
                         <td>{{ paciente.idade }}</td>
-                        <td>{{ paciente.CPF}}</td>
+                        <td>{{ paciente.cpf }}</td>
+                        <td>
                             <a href="{% url 'editar_paciente' paciente.id %}" class="btn btn-warning btn-sm">Editar</a>
                             <a href="{% url 'excluir_paciente' paciente.id %}" class="btn btn-danger btn-sm">Excluir</a>
                         </td>
                     </tr>
-                    {% empty %}
+                {% empty %}
                     <tr>
-                        <td colspan="4" class="text-center">
+                        <td colspan="5" class="text-center">
                             Nenhum paciente cadastrado.
                         </td>
                     </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 
-                    <!-- Modal Criar Paciente -->
-                    <div class="modal fade" id="modalCriarPaciente" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
+<!-- Modal Criar Paciente -->
+<div class="modal fade" id="modalCriarPaciente" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
 
-                        <div class="modal-header">
-                            <h5 class="modal-title">Cadastrar Paciente</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
+            <div class="modal-header">
+                <h5 class="modal-title">Cadastrar Paciente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
 
-                        <form method="POST" action="{% url 'criar_paciente' %}">
-                            {% csrf_token %}
-                            
-                            <div class="modal-body">
-
-                            <div class="mb-3">
-                                <label class="form-label">Nome:</label>
-                                <input type="text" name="nome" class="form-control" required>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Idade:</label>
-                                <input type="number" name="idade" class="form-control" required>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">CPF:</label>
-                                <input type="number" name="CPF" class="form-control" required>
-                            </div>
-
-                            </div>
-
-                            <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-success">Salvar</button>
-                            </div>
-
-                        </form>
-
-                        </div>
-                    </div>
+            <form method="POST" action="{% url 'criar_paciente' %}">
+                {% csrf_token %}
+                
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nome:</label>
+                        <input type="text" name="nome" class="form-control" required>
                     </div>
 
-                    {% endfor %}
-                </tbody>
-            </table>
+                    <div class="mb-3">
+                        <label class="form-label">Idade</label>
+                        <input type="number" name="idade" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">CPF:</label>
+                        <input type="number" name="cpf" class="form-control" required>
+                    </div>
+                    
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Salvar</button>
+                </div>
+
+            </form>
         </div>
     </div>
-
 </div>
+
 {% endblock %}

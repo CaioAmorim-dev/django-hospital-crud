@@ -5,6 +5,7 @@ class Paciente(models.Model):
     idade = models.IntegerField()
     contato = models.IntegerField()
     cpf = models.CharField(max_length=11, default="00000000000")
+    data_nascimento = models.DateField(null=True, blank=True)  
 
     def __str__(self):
         return self.nome
