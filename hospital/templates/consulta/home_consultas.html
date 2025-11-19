@@ -1,45 +1,107 @@
 {% extends 'base.html' %}
 
-{% block title %} Consultas - Sistema Hospitalar {% endblock %}
+{% block title %} Médicos - Sistema Hospitalar {% endblock %}
 
 {% block content %}
+<h2>Consultas</h2>
+<p>Bem-vindo à área de consultas. Aqui você pode visualizar e gerenciar consultas.</p>
 
-<div style="text-align: center;">
+    <!-- BOTÃO DE CRIAR PACIENTE -->
+    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#modalCriarConsulta">
+    Criar Consulta
+    </button>
 
-    <h2>📋 Listagem de Consultas</h2>
-    <p>Aqui você pode visualizar todas as consultas cadastradas.</p>
 
-    <p><a href="{% url 'criar_consulta' %}">➕ Nova Consulta</a></p>
+    <!-- TABELA DE PACIENTES -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Paciente</th>
+                        <th>Médico</th>
+                        <th>Data</th>
+                        <th>Hórario</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for consulta in consulta %}
+                    <tr>
+                        <td>{{ consulta.id }}</td>
+                        <td>{{ consulta.paciente }}</td>
+                        <td>{{ consulta.medico }}</td>
+                        <td>{{ consulta.data}}</td>
+                        <td>{{ consulta.horario}}</td>
+                            <a href="{% url 'editar_consulta' consulta.id %}" class="btn btn-warning btn-sm">Editar</a>
+                            <a href="{% url 'excluir_consulta' consulta.id %}" class="btn btn-danger btn-sm">Excluir</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center">
+                            Não há nenhuma consulta criada.
+                        </td>
+                    </tr>
 
-    <table border="1" cellpadding="8" cellspacing="0" width="70%" style="margin: 0 auto;">
-        <tr bgcolor="#f2f2f2">
-            <th>ID</th>
-            <th>Paciente</th>
-            <th>Médico</th>
-            <th>Data</th>
-            <th>Ações</th>
-        </tr>
+                    <!-- Modal Criar Paciente -->
+                    <div class="modal fade" id="modalCriarPaciente" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
 
-        {% for consulta in consulta %}
-        <tr align="center">
-            <td>{{ consulta.id }}</td>
-            <td>{{ consulta.paciente.nome }}</td>
-            <td>{{ consulta.medico.nome }}</td>
-            <td>{{ consulta.data }}</td>
-            <td>
-                <a href="{% url 'editar_consulta' consulta.id %}">✏️ Editar</a> |
-                <a href="{% url 'excluir_consulta' consulta.id %}">❌ Excluir</a>
-            </td>
-        </tr>
-        {% empty %}
-        <tr align="center">
-            <td colspan="5">Nenhuma consulta cadastrada.</td>
-        </tr>
-        {% endfor %}
-    </table>
+                        <div class="modal-header">
+                            <h5 class="modal-title">Criar Consulta</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
 
-    <p><a href="/">🏠 Voltar à página inicial</a></p>
+                        <form method="POST" action="{% url 'criar_consulta' %}">
+                            {% csrf_token %}
+                            
+                            <div class="modal-body">
+
+                            <div class="mb-3">
+                                <label class="form-label">Nome:</label>
+                                <input type="text" name="Nome" class="form-control" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Paciente:</label>
+                                <input type="text" name="Paciente" class="form-control" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Médico:</label>
+                                <input type="text" name="Médico" class="form-control" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Data:</label>
+                                <input type="date" name="Data" class="form-control" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Hórario:</label>
+                                <input type="time" name="Hórario" class="form-control" required>
+                            </div>
+                            
+                            </div>
+
+                            <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-success">Salvar</button>
+                            </div>
+
+                        </form>
+
+                        </div>
+                    </div>
+                    </div>
+
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
 </div>
-
 {% endblock %}
