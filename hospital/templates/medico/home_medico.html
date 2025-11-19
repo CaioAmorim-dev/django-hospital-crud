@@ -7,7 +7,7 @@
 <p>Bem-vindo à área do médico. Aqui você pode visualizar e gerenciar informações dos médicos.</p>
 
     <!-- BOTÃO DE CRIAR PACIENTE -->
-    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#modalCriarPaciente">
+    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#modalCriarMedico">
     Criar Médico
     </button>
 
@@ -43,7 +43,7 @@
                     </tr>
 
                     <!-- Modal Criar Paciente -->
-                    <div class="modal fade" id="modalCriarPaciente" tabindex="-1" aria-hidden="true">
+                    <div class="modal fade" id="modalCriarMedico" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
 
@@ -52,7 +52,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
 
-                        <form method="POST" action="{% url 'criar_paciente' %}">
+                        <form method="POST" action="{% url 'criar_medico' %}">
                             {% csrf_token %}
                             
                             <div class="modal-body">
