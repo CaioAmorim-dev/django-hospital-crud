@@ -1,8 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
 from django.utils import timezone
+from django.contrib import messages
 from .models import Paciente, Medico, Consulta
-
 from .models import Paciente, Medico, Consulta
 from .forms import PacienteForm, MedicoForm, ConsultaForm
 
@@ -147,22 +147,15 @@ def excluir_medico(request, medico_id):
 #CONSULTA
 
 def consulta_home(request):
+    # nova função
     termo = request.GET.get('q', '')
-
     consultas = Consulta.objects.all()
-
-    if termo:
-        consultas = consultas.filter(
-            Q(motivo__icontains=termo) |
-            Q(paciente__nome__icontains=termo) |
-            Q(medico__nome__icontains=termo)
-        )
-
+    form = ConsultaForm()  # <-- IMPORTANTE
     return render(request, 'consulta/home_consultas.html', {
         'termo': termo,
-        'consultas': consultas
+        'consultas': consultas,
+        'form': form
     })
-
 
 def criar_consulta(request):
     if request.method == 'POST':
@@ -170,14 +163,20 @@ def criar_consulta(request):
         if form.is_valid():
             form.save()
             return redirect('consulta_home')
-    else:
-        form = ConsultaForm()
+        else:
+            messages.error(request, "Erro ao criar consulta. Verifique os dados.")
+            return redirect('consulta_home')
 
-    return render(request, 'consulta/criar_consulta.html', {'form': form})
+    return redirect('consulta_home')
+
 
 
 def editar_consulta(request, id):
     consulta = get_object_or_404(Consulta, id=id)
+
+    if consulta.situacao == "CA":
+        messages.error(request, "Consultas canceladas não podem ser editadas.")
+        return redirect("consulta_home")
 
     if request.method == 'POST':
         form = ConsultaForm(request.POST, instance=consulta)
@@ -190,11 +189,13 @@ def editar_consulta(request, id):
     return render(request, 'consulta/editar_consulta.html', {'form': form})
 
 
-def excluir_consulta(request, id):
+def cancelar_consulta(request, id):
     consulta = get_object_or_404(Consulta, id=id)
 
-    if request.method == 'POST':
-        consulta.delete()
-        return redirect('consulta_home')
+    if request.method == "POST":
+        consulta.situacao = "CA"  # Cancelada
+        consulta.save()
+        return redirect("consulta_home")
 
-    return render(request, 'consulta/excluir_consulta.html', {'consulta': consulta})
+    return redirect("consulta_home")
+
