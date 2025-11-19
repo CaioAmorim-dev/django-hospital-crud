@@ -18,9 +18,9 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
+                        <th>ID</th>
                         <th>Nome</th>
                         <th>Idade</th>
-                        <th>Email</th>
                         <th>CPF</th>
 
                     </tr>
@@ -30,7 +30,6 @@
                     <tr>
                         <td>{{ paciente.nome }}</td>
                         <td>{{ paciente.idade }}</td>
-                        <td>{{ paciente.email }}</td>
                         <td>{{ paciente.CPF}}</td>
                             <a href="{% url 'editar_paciente' paciente.id %}" class="btn btn-warning btn-sm">Editar</a>
                             <a href="{% url 'excluir_paciente' paciente.id %}" class="btn btn-danger btn-sm">Excluir</a>
@@ -66,11 +65,6 @@
                             <div class="mb-3">
                                 <label class="form-label">Idade:</label>
                                 <input type="number" name="idade" class="form-control" required>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Email:</label>
-                                <input type="text" name="email" class="form-control" required>
                             </div>
 
                             <div class="mb-3">
