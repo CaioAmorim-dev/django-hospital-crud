@@ -51,9 +51,12 @@ class PacienteForm(forms.ModelForm):
 
     def clean_data_nascimento(self):
         data_nascimento = self.cleaned_data.get("data_nascimento")
-        if data_nascimento > date.today():
+
+        if data_nascimento and data_nascimento > date.today():
             raise ValidationError("A data de nascimento não pode ser no futuro.")
+
         return data_nascimento
+
 
 
 
