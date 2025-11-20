@@ -48,14 +48,22 @@ def home_paciente(request):
 
 def criar_paciente(request):
     if request.method == 'POST':
-        form = PacienteForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('paciente_home')
-    else:
-        form = PacienteForm()
+        nome = request.POST.get('nome')
+        idade = request.POST.get('idade')
+        contato = request.POST.get('contato')
+        cpf = request.POST.get('cpf')
+        data_nascimento = request.POST.get('data_nascimento')
 
-    return render(request, 'paciente/criar_paciente.html', {'form': form})
+        Paciente.objects.create(
+            nome=nome,
+            contato=contato,
+            cpf=cpf,
+            data_nascimento=data_nascimento
+        )
+
+        return redirect('paciente_home')  # volta para a lista
+
+    return redirect('paciente_home')
 
 
 def editar_paciente(request, id):

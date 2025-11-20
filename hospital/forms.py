@@ -12,8 +12,9 @@ class PacienteForm(forms.ModelForm):
         fields = ["nome", "contato", "cpf", "data_nascimento"]
         widgets = {
             'nome': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Digite o nome do paciente'}),
-            'contato': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Telefone ou e-mail'}),
-            'cpf': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Digite o CPF do paciente'}),
+            'idade': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Digite a idade do paciente'}),
+            'contato': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Telefone ou e-mail'}),
+            'cpf': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Digite o CPF do paciente'}),
             'data_nascimento': forms.DateInput(attrs={'type': 'date', 'class': 'form-control', 'placeholder': 'Data de nascimento'}),
         }
 

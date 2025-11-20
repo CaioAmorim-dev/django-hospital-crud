@@ -1,47 +1,53 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-from datetime import date
+from datetime import datetime, date
 
 class Paciente(models.Model):
     nome = models.CharField(max_length=100)
-    contato = models.CharField(max_length=15)  
-    cpf = models.CharField(max_length=11, default="00000000000")
-    data_nascimento = models.DateField(null=True, blank=True)
+    idade = models.IntegerField(default=0)
+    cpf = models.CharField(max_length=11, unique=True)
+    contato = models.CharField(max_length=15)
+    data_nascimento = models.DateField(null=False, blank=False)
 
     def __str__(self):
         return self.nome
 
-    @property
-    def idade(self):
-        """Calcula a idade do paciente com base na data de nascimento."""
-        
-        if self.data_nascimento:
-            today = date.today()
-            idade = today.year - self.data_nascimento.year
-            if today.month < self.data_nascimento.month or (today.month == self.data_nascimento.month and today.day < self.data_nascimento.day):
-                idade -= 1
-            return idade
-        return None  # Retorna None se a data de nascimento não estiver definida
-    
+    def save(self, *args, **kwargs):
+        # Se vier string, converte para date
+        if isinstance(self.data_nascimento, str):
+            self.data_nascimento = datetime.strptime(
+                self.data_nascimento, "%Y-%m-%d"
+            ).date()
+
+        # Calcula idade
+        hoje = date.today()
+        self.idade = hoje.year - self.data_nascimento.year - (
+            (hoje.month, hoje.day) < (self.data_nascimento.month, self.data_nascimento.day)
+        )
+
+        super().save(*args, **kwargs)
+
+
 class Medico(models.Model):
     ESPECIALIDADE_CHOICES = [
         ('oftalmologia', 'Oftalmologia'),
         ('cardiologia', 'Cardiologia'),
         ('dermatologia', 'Dermatologia'),
     ]
+
     nome = models.CharField(max_length=100)
     especialidade = models.CharField(
-        max_length=255, 
+        max_length=255,
         choices=ESPECIALIDADE_CHOICES,
         default='Clínico Geral'
     )
-    
     crm = models.CharField(max_length=20, unique=True)
     cpf = models.CharField(max_length=11, default="00000000000")
 
     def __str__(self):
         return self.nome
+
 
 class Consulta(models.Model):
     STATUS_CHOICES = [
@@ -59,9 +65,5 @@ class Consulta(models.Model):
         return f"{self.paciente.nome} - {self.medico.nome} ({self.get_situacao_display()})"
 
     def clean(self):
-        # Verifica se a data da consulta é no passado
         if self.data and self.data < timezone.now():
             raise ValidationError("A data da consulta não pode ser no passado.")
-
-    
-    
