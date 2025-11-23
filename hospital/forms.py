@@ -9,7 +9,7 @@ class PacienteForm(forms.ModelForm):
     class Meta:
         model = Paciente
         # PACIENTE TEM: nome, idade, contato, cpf, data_nascimento
-        fields = ["nome", "contato", "cpf", "data_nascimento"]
+        fields = ["nome", "idade", "contato", "cpf", "data_nascimento"]
         widgets = {
             'nome': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Digite o nome do paciente'}),
             'idade': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Digite a idade do paciente'}),
@@ -25,17 +25,17 @@ class PacienteForm(forms.ModelForm):
             raise ValidationError("Contato é obrigatório.")
         
         # Remove qualquer caractere que não seja número
-        contato_limpo = re.sub(r'\D', '', contato)
+        contato_limpo = re.sub(r'\D', '', str(contato))
 
         # só aceita dígitos, de 8 a 15
-        if not re.fullmatch(r'\d{8,15}', contato):
+        if not re.fullmatch(r'\d{8,15}', contato_limpo):
             raise ValidationError("Telefone inválido. Digite apenas números (8 a 15 dígitos).")
 
         # valida duplicidade de contato
-        if Paciente.objects.filter(contato=contato).exclude(id=self.instance.id).exists():
+        if Paciente.objects.filter(contato=contato_limpo).exclude(id=self.instance.id).exists():
             raise ValidationError("Este telefone já está cadastrado para outro paciente.")
 
-        return contato
+        return contato_limpo
 
     def clean_cpf(self):
         cpf = self.cleaned_data.get("cpf")
@@ -59,8 +59,15 @@ class PacienteForm(forms.ModelForm):
     def clean_data_nascimento(self):
         data_nascimento = self.cleaned_data.get("data_nascimento")
 
+        if not data_nascimento:
+            raise ValidationError("Data de nascimento é obrigatória.")
+
         if data_nascimento and data_nascimento > date.today():
             raise ValidationError("A data de nascimento não pode ser no futuro.")
+        
+        idade = date.today().year - data_nascimento.year
+        if idade > 130:
+            raise ValidationError("Idade acima do limite permitido (130 anos).")
 
         return data_nascimento
 
@@ -73,22 +80,10 @@ class MedicoForm(forms.ModelForm):
         # MODELO TEM: nome, especialidade, crm, cpf
         fields = ['nome', 'especialidade', 'crm', 'cpf']
         widgets = {
-            'nome': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Nome do médico'
-            }),
-            'especialidade': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Especialidade'
-            }),
-            'crm': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'CRM do médico'
-            }),
-            'cpf': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Digite o CPF do médico'
-            }),
+            'nome': forms.TextInput(attrs={'class': 'form-control','placeholder': 'Nome do médico'}),
+            'especialidade': forms.TextInput(attrs={'class': 'form-control','placeholder': 'Especialidade'}),
+            'crm': forms.TextInput(attrs={'class': 'form-control','placeholder': 'CRM do médico'}),
+            'cpf': forms.TextInput(attrs={'class': 'form-control','placeholder': 'Digite o CPF do médico'}),
         }
 
     def clean_crm(self):
@@ -99,7 +94,7 @@ class MedicoForm(forms.ModelForm):
 
         # exemplo simples: só dígitos e letras, mínimo 4 caracteres
         if not re.fullmatch(r'[A-Za-z0-9]{4,20}', str(crm)):
-            raise ValidationError("CRM inválido. Use de 4 a 20 caracteres, letras e números.")
+            raise ValidationError("CRM inválido. Use somente letras e números (4 a 20 caracteres).")
 
         if Medico.objects.filter(crm=crm).exclude(id=self.instance.id).exists():
             raise ValidationError("Este CRM já está cadastrado para outro médico.")
@@ -130,10 +125,7 @@ class ConsultaForm(forms.ModelForm):
         widgets = {
             'paciente': forms.Select(attrs={'class': 'form-select'}),
             'medico': forms.Select(attrs={'class': 'form-select'}),
-            'data': forms.DateTimeInput(attrs={
-                'class': 'form-control',
-                'type': 'datetime-local'
-            }),
+            'data': forms.DateTimeInput(attrs={'class': 'form-control','type': 'datetime-local'}),
             'situacao': forms.Select(attrs={'class': 'form-select'}),
         }
 
@@ -142,7 +134,10 @@ class ConsultaForm(forms.ModelForm):
 
         data = self.cleaned_data.get("data")
 
-        if data and data < timezone.now():
+        if not data:
+            raise ValidationError("A data da consulta é obrigatória.")
+
+        if data < timezone.now():
             raise ValidationError("A data da consulta não pode ser no passado.")
 
         return data
