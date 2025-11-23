@@ -23,9 +23,12 @@ class PacienteForm(forms.ModelForm):
 
         if not contato:
             raise ValidationError("Contato é obrigatório.")
+        
+        # Remove qualquer caractere que não seja número
+        contato_limpo = re.sub(r'\D', '', contato)
 
         # só aceita dígitos, de 8 a 15
-        if not re.fullmatch(r'\d{8,15}', str(contato)):
+        if not re.fullmatch(r'\d{8,15}', contato):
             raise ValidationError("Telefone inválido. Digite apenas números (8 a 15 dígitos).")
 
         # valida duplicidade de contato
@@ -44,6 +47,9 @@ class PacienteForm(forms.ModelForm):
 
         if len(cpf_digits) != 11:
             raise ValidationError("CPF inválido. Deve conter 11 dígitos.")
+        
+        if cpf_digits == cpf_digits[0] * 11:
+            raise ValidationError("CPF inválido.")
 
         if Paciente.objects.filter(cpf=cpf_digits).exclude(id=self.instance.id).exists():
             raise ValidationError("Este CPF já está cadastrado.")
