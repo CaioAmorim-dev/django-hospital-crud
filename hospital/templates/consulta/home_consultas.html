@@ -72,13 +72,14 @@
 
                     <!-- AÇÕES -->
                     <td>
-                        <a href="{% url 'editar_consulta' consulta.id %}" class="btn btn-warning btn-sm">
+                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal" 
+                                data-bs-target="#modalEditarConsulta{{ consulta.id }}">
                             Editar
-                        </a>
+                        </button>
 
                         {% if consulta.situacao != "CA" %}
-                        <button class="btn btn-danger btn-sm"
-                                onclick="abrirModalCancelar('{{ consulta.id }}')">
+                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" 
+                                data-bs-target="#modalCancelarConsulta{{ consulta.id }}">
                             Cancelar
                         </button>
                         {% endif %}
@@ -111,26 +112,29 @@
                 <div class="modal-body">
 
                     <div class="mb-3">
-                        <label class="form-label">Paciente:</label>
-                        <input type="text" name="paciente" class="form-control" required>
-                        {{ form.paciente }}
+                        <label class="form-label">CPF do Paciente:</label>
+                        <input type="text" name="cpf_paciente" class="form-control" placeholder="Digite o CPF do paciente" required>
+                        <small class="form-text text-muted">O paciente deve estar cadastrado no sistema</small>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Médico:</label>
-                        <input type="text" name="medico" class="form-control" required>
-                        {{ form.medico }}
+                        <label class="form-label">CPF do Médico:</label>
+                        <input type="text" name="cpf_medico" class="form-control" placeholder="Digite o CPF do médico" required>
+                        <small class="form-text text-muted">O médico deve estar cadastrado no sistema</small>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Data:</label>
-                        <input type="date" name="data" class="form-control" required>
-                        {{ form.data }}
+                        <label class="form-label">Data e Hora:</label>
+                        <input type="datetime-local" name="data" class="form-control" required>
                     </div>
 
-                     <div class="mb-3">
-                        <label class="form-label">Horário:</label>
-                        <input type="time" name="horario" class="form-control" required>
+                    <div class="mb-3">
+                        <label class="form-label">Situação:</label>
+                        <select name="situacao" class="form-select">
+                            <option value="AG" selected>Agendada</option>
+                            <option value="RE">Realizada</option>
+                            <option value="CA">Cancelada</option>
+                        </select>
                     </div>
 
                 </div>
@@ -147,44 +151,72 @@
 </div>
 
 
-<!-- MODAL CANCELAR CONSULTA -->
-<div class="modal fade" id="modalCancelarConsulta" tabindex="-1" aria-hidden="true">
+<!-- Modais de Editar e Cancelar para cada consulta -->
+{% for consulta in consultas %}
+<!-- Modal Editar Consulta -->
+<div class="modal fade" id="modalEditarConsulta{{ consulta.id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title">Cancelar Consulta</h5>
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Consulta</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-
-            <form method="POST" id="formCancelarConsulta">
+            <form method="POST" action="{% url 'editar_consulta' consulta.id %}">
                 {% csrf_token %}
-
                 <div class="modal-body">
-                    Tem certeza que deseja cancelar esta consulta?
-                    <br><strong>Ela não será excluída, apenas marcada como cancelada.</strong>
+                    <div class="mb-3">
+                        <label class="form-label">CPF do Paciente:</label>
+                        <input type="text" name="cpf_paciente" class="form-control" value="{{ consulta.paciente.cpf }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">CPF do Médico:</label>
+                        <input type="text" name="cpf_medico" class="form-control" value="{{ consulta.medico.cpf }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Data e Hora:</label>
+                        <input type="datetime-local" name="data" class="form-control" 
+                               value="{{ consulta.data|date:'Y-m-d' }}T{{ consulta.data|time:'H:i' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Situação:</label>
+                        <select name="situacao" class="form-select">
+                            <option value="AG" {% if consulta.situacao == 'AG' %}selected{% endif %}>Agendada</option>
+                            <option value="RE" {% if consulta.situacao == 'RE' %}selected{% endif %}>Realizada</option>
+                            <option value="CA" {% if consulta.situacao == 'CA' %}selected{% endif %}>Cancelada</option>
+                        </select>
+                    </div>
                 </div>
-
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Voltar</button>
-                    <button type="submit" class="btn btn-danger">Cancelar Consulta</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Salvar</button>
                 </div>
-
             </form>
-
         </div>
     </div>
 </div>
 
-
-<script>
-    function abrirModalCancelar(id) {
-        const form = document.getElementById("formCancelarConsulta");
-        form.action = "/consultas/cancelar/" + id + "/";
-
-        const modal = new bootstrap.Modal(document.getElementById("modalCancelarConsulta"));
-        modal.show();
-    }
-</script>
+<!-- Modal Cancelar Consulta -->
+<div class="modal fade" id="modalCancelarConsulta{{ consulta.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Cancelar Consulta</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{% url 'cancelar_consulta' consulta.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    Tem certeza que deseja cancelar a consulta de <strong>{{ consulta.paciente.nome }}</strong> com <strong>{{ consulta.medico.nome }}</strong>?
+                    <br><br><strong>Ela não será excluída, apenas marcada como cancelada.</strong>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Voltar</button>
+                    <button type="submit" class="btn btn-danger">Cancelar Consulta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
 
 {% endblock %}
