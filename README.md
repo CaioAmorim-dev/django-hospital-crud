@@ -1,4 +1,3 @@
-@@ -1,6 +1,6 @@
 # 🏥 Sistema Hospitalar — Projeto de Introdução à Programação
 
 ## Introdução
