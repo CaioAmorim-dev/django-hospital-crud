@@ -73,14 +73,13 @@ def editar_paciente(request, id):
         form = PacienteForm(request.POST, instance=paciente)
         if form.is_valid():
             form.save()
+            messages.success(request, "Paciente atualizado com sucesso!")
             return redirect('paciente_home')
-    else:
-        form = PacienteForm(instance=paciente)
+        else:
+            messages.error(request, "Erro ao atualizar paciente. Verifique os dados.")
+            return redirect('paciente_home')
 
-    return render(request, 'paciente/editar_paciente.html', {
-        'form': form,
-        'paciente': paciente
-    })
+    return redirect('paciente_home')
 
 
 def excluir_paciente(request, id):
@@ -88,9 +87,10 @@ def excluir_paciente(request, id):
 
     if request.method == 'POST':
         paciente.delete()
+        messages.success(request, "Paciente excluído com sucesso!")
         return redirect('paciente_home')
 
-    return render(request, 'paciente/excluir_paciente.html', {'paciente': paciente})
+    return redirect('paciente_home')
 
 
 # MEDICO 
@@ -118,11 +118,13 @@ def criar_medico(request):
         form = MedicoForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, "Médico criado com sucesso!")
             return redirect('medico_home')
-    else:
-        form = MedicoForm()
+        else:
+            messages.error(request, "Erro ao criar médico. Verifique os dados.")
+            return redirect('medico_home')
 
-    return render(request, 'medico/criar_medico.html', {'form': form})
+    return redirect('medico_home')
 
 
 def editar_medico(request, medico_id):
@@ -132,14 +134,13 @@ def editar_medico(request, medico_id):
         form = MedicoForm(request.POST, instance=medico)
         if form.is_valid():
             form.save()
+            messages.success(request, "Médico atualizado com sucesso!")
             return redirect('medico_home')
-    else:
-        form = MedicoForm(instance=medico)
+        else:
+            messages.error(request, "Erro ao atualizar médico. Verifique os dados.")
+            return redirect('medico_home')
 
-    return render(request, 'medico/editar_medico.html', {
-        'form': form,
-        'medico': medico
-    })
+    return redirect('medico_home')
 
 
 def excluir_medico(request, medico_id):
@@ -147,9 +148,10 @@ def excluir_medico(request, medico_id):
 
     if request.method == 'POST':
         medico.delete()
+        messages.success(request, "Médico excluído com sucesso!")
         return redirect('medico_home')
 
-    return render(request, 'medico/excluir_medico.html', {'medico': medico})
+    return redirect('medico_home')
 
 
 #CONSULTA
@@ -206,11 +208,13 @@ def editar_consulta(request, id):
         form = ConsultaForm(request.POST, instance=consulta)
         if form.is_valid():
             form.save()
+            messages.success(request, "Consulta atualizada com sucesso!")
             return redirect('consulta_home')
-    else:
-        form = ConsultaForm(instance=consulta)
+        else:
+            messages.error(request, "Erro ao atualizar consulta. Verifique os dados.")
+            return redirect('consulta_home')
 
-    return render(request, 'consulta/editar_consulta.html', {'form': form})
+    return redirect('consulta_home')
 
 
 def cancelar_consulta(request, id):
