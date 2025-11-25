@@ -54,8 +54,14 @@
                         <td>{{ paciente.cpf }}</td>
                         <td>{{ paciente.data_nascimento}}</td>
                         <td>
-                            <a href="{% url 'editar_paciente' paciente.id %}" class="btn btn-warning btn-sm">Editar</a>
-                            <a href="{% url 'excluir_paciente' paciente.id %}" class="btn btn-danger btn-sm">Excluir</a>
+                            <button class="btn btn-warning btn-sm" data-bs-toggle="modal" 
+                                    data-bs-target="#modalEditarPaciente{{ paciente.id }}">
+                                Editar
+                            </button>
+                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" 
+                                    data-bs-target="#modalExcluirPaciente{{ paciente.id }}">
+                                Excluir
+                            </button>
                         </td>
                     </tr>
                 {% empty %}
@@ -115,5 +121,68 @@
         </div>
     </div>
 </div>
+
+<!-- Modais de Editar e Excluir para cada paciente -->
+{% for paciente in pacientes %}
+<!-- Modal Editar Paciente -->
+<div class="modal fade" id="modalEditarPaciente{{ paciente.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Paciente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{% url 'editar_paciente' paciente.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nome:</label>
+                        <input type="text" name="nome" class="form-control" value="{{ paciente.nome }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Contato:</label>
+                        <input type="text" name="contato" class="form-control" value="{{ paciente.contato }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">CPF:</label>
+                        <input type="text" name="cpf" class="form-control" value="{{ paciente.cpf }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Data de Nascimento:</label>
+                        <input type="date" name="data_nascimento" class="form-control" value="{{ paciente.data_nascimento|date:'Y-m-d' }}" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Excluir Paciente -->
+<div class="modal fade" id="modalExcluirPaciente{{ paciente.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Excluir Paciente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{% url 'excluir_paciente' paciente.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    Tem certeza que deseja excluir o paciente <strong>{{ paciente.nome }}</strong>?
+                    <br><br>Esta ação não pode ser desfeita.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
 
 {% endblock %}
