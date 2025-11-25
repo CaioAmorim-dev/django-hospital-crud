@@ -49,10 +49,6 @@ venv\Scripts\activate
 ```
 pip install django
 ```
-**Fazer migrations**
-```
-python manage.py makemigrations
-```
 **Aplicar migrations**
 ```
 python manage.py migrate
