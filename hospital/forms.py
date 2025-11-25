@@ -81,7 +81,7 @@ class MedicoForm(forms.ModelForm):
         fields = ['nome', 'especialidade', 'crm', 'cpf']
         widgets = {
             'nome': forms.TextInput(attrs={'class': 'form-control','placeholder': 'Nome do médico'}),
-            'especialidade': forms.TextInput(attrs={'class': 'form-control','placeholder': 'Especialidade'}),
+            'especialidade': forms.Select(attrs={'class': 'form-select'}),
             'crm': forms.TextInput(attrs={'class': 'form-control','placeholder': 'CRM do médico'}),
             'cpf': forms.TextInput(attrs={'class': 'form-control','placeholder': 'Digite o CPF do médico'}),
         }
@@ -119,15 +119,63 @@ class MedicoForm(forms.ModelForm):
 
 
 class ConsultaForm(forms.ModelForm):
+    cpf_paciente = forms.CharField(
+        max_length=11,
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'CPF do paciente'}),
+        label='CPF do Paciente'
+    )
+    cpf_medico = forms.CharField(
+        max_length=11,
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'CPF do médico'}),
+        label='CPF do Médico'
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Se estamos editando uma consulta existente, preencher os campos CPF
+        if self.instance and self.instance.pk:
+            self.fields['cpf_paciente'].initial = self.instance.paciente.cpf
+            self.fields['cpf_medico'].initial = self.instance.medico.cpf
+
     class Meta:
         model = Consulta
-        fields = ['paciente', 'medico', 'data', 'situacao']
+        fields = ['data', 'situacao']
         widgets = {
-            'paciente': forms.Select(attrs={'class': 'form-select'}),
-            'medico': forms.Select(attrs={'class': 'form-select'}),
             'data': forms.DateTimeInput(attrs={'class': 'form-control','type': 'datetime-local'}),
             'situacao': forms.Select(attrs={'class': 'form-select'}),
         }
+
+    def clean_cpf_paciente(self):
+        cpf = self.cleaned_data.get('cpf_paciente')
+        cpf_digits = re.sub(r'\D', '', str(cpf))
+        
+        if len(cpf_digits) != 11:
+            raise ValidationError("CPF inválido. Deve conter 11 dígitos.")
+        
+        try:
+            paciente = Paciente.objects.get(cpf=cpf_digits)
+            self.cleaned_data['paciente'] = paciente
+        except Paciente.DoesNotExist:
+            raise ValidationError("Paciente com este CPF não encontrado. Cadastre o paciente primeiro.")
+        
+        return cpf_digits
+
+    def clean_cpf_medico(self):
+        cpf = self.cleaned_data.get('cpf_medico')
+        cpf_digits = re.sub(r'\D', '', str(cpf))
+        
+        if len(cpf_digits) != 11:
+            raise ValidationError("CPF inválido. Deve conter 11 dígitos.")
+        
+        try:
+            medico = Medico.objects.get(cpf=cpf_digits)
+            self.cleaned_data['medico'] = medico
+        except Medico.DoesNotExist:
+            raise ValidationError("Médico com este CPF não encontrado. Cadastre o médico primeiro.")
+        
+        return cpf_digits
 
     def clean_data(self):
         from django.utils import timezone
@@ -137,7 +185,16 @@ class ConsultaForm(forms.ModelForm):
         if not data:
             raise ValidationError("A data da consulta é obrigatória.")
 
-        if data < timezone.now():
+        # Apenas bloquear data no passado ao criar nova consulta (não ao editar)
+        if not self.instance.pk and data < timezone.now():
             raise ValidationError("A data da consulta não pode ser no passado.")
 
         return data
+
+    def save(self, commit=True):
+        consulta = super().save(commit=False)
+        consulta.paciente = self.cleaned_data['paciente']
+        consulta.medico = self.cleaned_data['medico']
+        if commit:
+            consulta.save()
+        return consulta
