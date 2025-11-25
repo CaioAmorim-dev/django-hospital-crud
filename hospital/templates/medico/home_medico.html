@@ -29,7 +29,9 @@
                     <th>ID</th>
                     <th>Nome</th>
                     <th>Especialidade</th>
+                    <th>CRM</th>
                     <th>CPF</th>
+                    <th>Ações</th>
                 </tr>
             </thead>
             <tbody>
@@ -37,16 +39,23 @@
                 <tr>
                     <td>{{ medico.id }}</td>
                     <td>{{ medico.nome }}</td>
-                    <td>{{ medico.especialidade }}</td>
+                    <td>{{ medico.get_especialidade_display }}</td>
+                    <td>{{ medico.crm }}</td>
                     <td>{{ medico.cpf }}</td>
                     <td>
-                        <a href="{% url 'editar_medico' medico.id %}" class="btn btn-warning btn-sm">Editar</a>
-                        <a href="{% url 'excluir_medico' medico.id %}" class="btn btn-danger btn-sm">Excluir</a>
+                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal" 
+                                data-bs-target="#modalEditarMedico{{ medico.id }}">
+                            Editar
+                        </button>
+                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" 
+                                data-bs-target="#modalExcluirMedico{{ medico.id }}">
+                            Excluir
+                        </button>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="4" class="text-center">Nenhum médico cadastrado.</td>
+                    <td colspan="6" class="text-center">Nenhum médico cadastrado.</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -71,7 +80,16 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Especialidade:</label>
-                        <input type="text" name="especialidade" class="form-control" required>
+                        <select name="especialidade" class="form-select" required>
+                            <option value="">Selecione uma especialidade</option>
+                            <option value="oftalmologia">Oftalmologia</option>
+                            <option value="cardiologia">Cardiologia</option>
+                            <option value="dermatologia">Dermatologia</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">CRM:</label>
+                        <input type="text" name="crm" class="form-control" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">CPF:</label>
@@ -86,5 +104,72 @@
         </div>
     </div>
 </div>
+
+<!-- Modais de Editar e Excluir para cada médico -->
+{% for medico in medicos %}
+<!-- Modal Editar Médico -->
+<div class="modal fade" id="modalEditarMedico{{ medico.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Médico</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{% url 'editar_medico' medico.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nome:</label>
+                        <input type="text" name="nome" class="form-control" value="{{ medico.nome }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Especialidade:</label>
+                        <select name="especialidade" class="form-select" required>
+                            <option value="oftalmologia" {% if medico.especialidade == 'oftalmologia' %}selected{% endif %}>Oftalmologia</option>
+                            <option value="cardiologia" {% if medico.especialidade == 'cardiologia' %}selected{% endif %}>Cardiologia</option>
+                            <option value="dermatologia" {% if medico.especialidade == 'dermatologia' %}selected{% endif %}>Dermatologia</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">CRM:</label>
+                        <input type="text" name="crm" class="form-control" value="{{ medico.crm }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">CPF:</label>
+                        <input type="text" name="cpf" class="form-control" value="{{ medico.cpf }}" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Excluir Médico -->
+<div class="modal fade" id="modalExcluirMedico{{ medico.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Excluir Médico</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{% url 'excluir_medico' medico.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    Tem certeza que deseja excluir o médico <strong>{{ medico.nome }}</strong>?
+                    <br><br>Esta ação não pode ser desfeita.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
 
 {% endblock %}
