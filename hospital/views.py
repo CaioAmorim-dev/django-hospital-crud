@@ -139,6 +139,8 @@ def editar_medico(request, medico_id):
         else:
             messages.error(request, "Erro ao atualizar médico. Verifique os dados.")
             return redirect('medico_home')
+    else:
+        form = MedicoForm(instance=medico)
 
     return redirect('medico_home')
 
