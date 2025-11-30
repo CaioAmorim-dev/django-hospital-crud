@@ -159,43 +159,30 @@ def excluir_medico(request, medico_id):
 #CONSULTA
 
 def consulta_home(request):
-    # nova função
-    termo = request.GET.get('q', '')
-    data_inicio = request.GET.get('data_inicio', '')
-    data_fim = request.GET.get('data_fim', '')
-
     consultas = Consulta.objects.all()
-    
-    if termo:
-        consultas = consultas.filter(
-            Q(paciente__nome__icontains=termo) |
-            Q(medico__nome__icontains=termo) |
-            Q(data__icontains=termo)
-        )
-
-    if data_inicio:
-        consultas = consultas.filter(data__date__gte=data_inicio)
-    if data_fim:
-        consultas = consultas.filter(data__date__lte=data_fim)
-
-    return render(request, 'consulta/home_consultas.html', {
-        'termo': termo,
-        'data_inicio': data_inicio,
-        'data_fim': data_fim,
-        'consultas': consultas
-    })
+    print("CONSULTAS ENCONTRADAS:", consultas)
+    return render(request, 'consulta/home_consultas.html', {'consultas': consultas})
 
 def criar_consulta(request):
-    if request.method == 'POST':
-        form = ConsultaForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('consulta_home')
-        else:
-            messages.error(request, "Erro ao criar consulta. Verifique os dados.")
-            return redirect('consulta_home')
+    if request.method == "POST":
+        cpf_paciente = request.POST.get("cpf_paciente")
+        cpf_medico = request.POST.get("cpf_medico")
+        data = request.POST.get("data")
+        situacao = request.POST.get("situacao")
 
-    return redirect('consulta_home')
+        paciente = get_object_or_404(Paciente, cpf=cpf_paciente)
+        medico = get_object_or_404(Medico, cpf=cpf_medico)
+
+        Consulta.objects.create(
+            paciente=paciente,
+            medico=medico,
+            data=data,
+            situacao=situacao
+        )
+
+        return redirect("consulta_home")
+
+    return redirect("consulta_home")
 
 
 
