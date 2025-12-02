@@ -26,8 +26,11 @@ def home(request):
     consultas_agendadas = Consulta.objects.filter(situacao='AG').count()
     consultas_realizadas = Consulta.objects.filter(situacao='RE').count()
     
-    # Próximas consultas
-    proximas_consultas = Consulta.objects.filter(data__gte=agora).order_by('data')[:5]
+    # Próximas consultas (apenas agendadas e futuras)
+    proximas_consultas = Consulta.objects.filter(
+        data__gte=agora,
+        situacao='AG'
+    ).order_by('data')[:5]
     
     # Médicos por especialidade
     medicos_por_especialidade = Medico.objects.values('especialidade').annotate(
@@ -55,10 +58,11 @@ def home(request):
     return render(request, 'home.html', contexto)
 
 
-# PACIENTE 
-
 def home_paciente(request):
     termo = request.GET.get('q', '')
+    data_nascimento_inicio = request.GET.get('data_nascimento_inicio', '')
+    data_nascimento_fim = request.GET.get('data_nascimento_fim', '')
+    contato = request.GET.get('contato', '')
 
     pacientes = Paciente.objects.all()
 
@@ -66,11 +70,22 @@ def home_paciente(request):
         pacientes = pacientes.filter(
             Q(nome__icontains=termo) |
             Q(cpf__icontains=termo) |
-            Q(telefone__icontains=termo)
+            Q(contato__icontains=termo)
         )
+
+    if data_nascimento_inicio:
+        pacientes = pacientes.filter(data_nascimento__gte=data_nascimento_inicio)
+    if data_nascimento_fim:
+        pacientes = pacientes.filter(data_nascimento__lte=data_nascimento_fim)
+
+    if contato:
+        pacientes = pacientes.filter(contato__icontains=contato)
 
     return render(request, 'paciente/home_paciente.html', {
         'termo': termo,
+        'data_nascimento_inicio': data_nascimento_inicio,
+        'data_nascimento_fim': data_nascimento_fim,
+        'contato': contato,
         'pacientes': pacientes
     })
 
@@ -82,6 +97,16 @@ def criar_paciente(request):
         cpf = request.POST.get('cpf')
         data_nascimento = request.POST.get('data_nascimento')
 
+        # Validar se o CPF já existe para paciente
+        if Paciente.objects.filter(cpf=cpf).exists():
+            messages.error(request, f"Já existe um paciente cadastrado com o CPF {cpf}. Por favor, utilize um CPF diferente.")
+            return redirect('paciente_home')
+        
+        # Validar se o CPF já existe para médico (validação cross-table)
+        if Medico.objects.filter(cpf=cpf).exists():
+            messages.error(request, f"Este CPF ({cpf}) já está associado a um médico. Por favor, utilize um CPF diferente.")
+            return redirect('paciente_home')
+
         # Validação da data de nascimento
         if data_nascimento:
             data_nascimento_obj = date.fromisoformat(data_nascimento)
@@ -91,14 +116,17 @@ def criar_paciente(request):
                 messages.error(request, "A data de nascimento não pode ser no futuro!")
                 return redirect('paciente_home')
 
-        Paciente.objects.create(
-            nome=nome,
-            contato=contato,
-            cpf=cpf,
-            data_nascimento=data_nascimento
-        )
-        
-        messages.success(request, "Paciente criado com sucesso!")
+        try:
+            Paciente.objects.create(
+                nome=nome,
+                contato=contato,
+                cpf=cpf,
+                data_nascimento=data_nascimento
+            )
+            messages.success(request, "Paciente criado com sucesso!")
+        except Exception as e:
+            messages.error(request, f"Erro ao criar paciente: {str(e)}")
+
         return redirect('paciente_home')
 
     return redirect('paciente_home')
@@ -167,16 +195,34 @@ def criar_medico(request):
         nome = request.POST.get('nome')
         especialidade = request.POST.get('especialidade')
         crm = request.POST.get('crm')
-        contato = request.POST.get('contato', '')
         cpf = request.POST.get('cpf')
+
+        # Validar se o CRM já existe
+        if Medico.objects.filter(crm=crm).exists():
+            messages.error(request, f"Já existe um médico cadastrado com o CRM {crm}. Por favor, utilize um CRM diferente.")
+            return redirect('medico_home')
+
+        # Validar se o CPF já existe para médico
+        if Medico.objects.filter(cpf=cpf).exists():
+            messages.error(request, f"Já existe um médico cadastrado com o CPF {cpf}. Por favor, utilize um CPF diferente.")
+            return redirect('medico_home')
         
-        Medico.objects.create(
-            nome=nome,
-            especialidade=especialidade,
-            crm=crm,
-            cpf=cpf
-        )
-        messages.success(request, "Médico criado com sucesso!")
+        # Validar se o CPF já existe para paciente (validação cross-table)
+        if Paciente.objects.filter(cpf=cpf).exists():
+            messages.error(request, f"Este CPF ({cpf}) já está associado a um paciente. Por favor, utilize um CPF diferente.")
+            return redirect('medico_home')
+
+        try:
+            Medico.objects.create(
+                nome=nome,
+                especialidade=especialidade,
+                crm=crm,
+                cpf=cpf
+            )
+            messages.success(request, "Médico criado com sucesso!")
+        except Exception as e:
+            messages.error(request, f"Erro ao criar médico: {str(e)}")
+
         return redirect('medico_home')
 
     return redirect('medico_home')
@@ -223,17 +269,45 @@ def criar_consulta(request):
         data = request.POST.get("data")
         situacao = request.POST.get("situacao")
 
-        paciente = get_object_or_404(Paciente, cpf=cpf_paciente)
-        medico = get_object_or_404(Medico, cpf=cpf_medico)
+        try:
+            paciente = get_object_or_404(Paciente, cpf=cpf_paciente)
+            medico = get_object_or_404(Medico, cpf=cpf_medico)
 
-        Consulta.objects.create(
-            paciente=paciente,
-            medico=medico,
-            data=data,
-            situacao=situacao
-        )
-        
-        messages.success(request, "Consulta criada com sucesso!")
+            # Converter data string para datetime
+            from datetime import datetime, timedelta
+            data_datetime = datetime.fromisoformat(data)
+
+            # Verificar conflito de horário: 20 minutos antes e depois
+            intervalo_minimo = timedelta(minutes=20)
+            
+            consultas_conflito = Consulta.objects.filter(
+                medico=medico,
+                situacao__in=['AG', 'RE']  # Verificar apenas agendadas e realizadas
+            ).filter(
+                data__gte=data_datetime - intervalo_minimo,
+                data__lte=data_datetime + intervalo_minimo
+            ).exclude(id=None)  # Excluir consulta atual se estiver editando
+
+            if consultas_conflito.exists():
+                consulta_proxima = consultas_conflito.first()
+                messages.error(
+                    request, 
+                    f"Conflito de horário! O médico {medico.nome} já possui uma consulta agendada próxima a este horário. "
+                    f"Última consulta: {consulta_proxima.data.strftime('%d/%m/%Y às %H:%M')}. "
+                    f"Por favor, escolha um horário com pelo menos 20 minutos de intervalo."
+                )
+                return redirect("consulta_home")
+
+            Consulta.objects.create(
+                paciente=paciente,
+                medico=medico,
+                data=data_datetime,
+                situacao=situacao
+            )
+            messages.success(request, "Consulta criada com sucesso!")
+        except Exception as e:
+            messages.error(request, f"Erro ao criar consulta: {str(e)}")
+
         return redirect("consulta_home")
 
     return redirect("consulta_home")
