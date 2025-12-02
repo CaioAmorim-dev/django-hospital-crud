@@ -1,199 +1,453 @@
-<!DOCTYPE html>
-<html lang="pt-br">
+{% extends 'base.html' %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>{% block title %}Sistema Hospitalar{% endblock %}</title>
+{% block title %}Dashboard - Sistema Hospitalar{% endblock %}
 
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+{% block extra_head %}
+<style>
+    .stat-card {
+        border-radius: 15px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: none;
+        overflow: hidden;
+    }
 
-    <!-- Ícones Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+    }
 
-    <style>
-        body {
-            background-color: #f5f7fa;
-        }
+    .stat-icon {
+        font-size: 3rem;
+        opacity: 0.8;
+    }
 
-        .navbar-custom {
-            background: linear-gradient(90deg, #0d6efd, #0b5ed7);
-        }
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 10px 0;
+    }
 
-        footer {
-            background: #0d6efd;
-        }
+    .card-gradient-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
 
-        .footer-text {
-            color: white;
-        }
+    .card-gradient-success {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+    }
 
-        .content-wrapper {
-            padding: 30px 0 70px 0;
-        }
-    </style>
+    .card-gradient-warning {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+    }
 
-    {% block extra_head %}{% endblock %}
-</head>
+    .card-gradient-info {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        color: white;
+    }
 
-<body>
+    .card-gradient-danger {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        color: white;
+    }
 
-    <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom shadow">
-        <div class="container">
+    .card-gradient-secondary {
+        background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+        color: white;
+    }
 
-            <a class="navbar-brand fw-bold" href="{% url 'home' %}">
-                <i class="bi bi-hospital fs-4"></i> Sistema Hospitalar
-            </a>
+    .section-title {
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 20px;
+        position: relative;
+        padding-bottom: 10px;
+    }
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarNav" aria-controls="navbarNav"
-                aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, #0d6efd, #0b5ed7);
+        border-radius: 2px;
+    }
 
-            <div class="collapse navbar-collapse" id="navbarNav">
+    .table-consultas {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+    }
 
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link fw-semibold" href="{% url 'home' %}">
-                            <i class="bi bi-house-door"></i> Início
-                        </a>
-                    </li>
+    .badge-custom {
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-weight: 600;
+    }
 
-                    <li class="nav-item">
-                        <a class="nav-link fw-semibold" href="{% url 'paciente_home' %}">
-                            <i class="bi bi-people"></i> Pacientes
-                        </a>
-                    </li>
+    .quick-action-btn {
+        border-radius: 10px;
+        padding: 15px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
 
-                    <li class="nav-item">
-                        <a class="nav-link fw-semibold" href="{% url 'medico_home' %}">
-                            <i class="bi bi-person-badge"></i> Médicos
-                        </a>
-                    </li>
+    .quick-action-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
 
-                    <li class="nav-item">
-                        <a class="nav-link fw-semibold" href="{% url 'consulta_home' %}">
-                            <i class="bi bi-calendar2-check"></i> Consultas
-                        </a>
-                    </li>
+    .progress-custom {
+        height: 8px;
+        border-radius: 10px;
+    }
 
-                    <li class="nav-item">
-                        <a class="nav-link fw-semibold" href="/admin/">
-                            <i class="bi bi-gear"></i> Admin
-                        </a>
-                    </li>
-                </ul>
+    .especialidade-item {
+        padding: 10px 15px;
+        margin-bottom: 8px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
+    .welcome-banner {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Banner de Boas-vindas -->
+<div class="welcome-banner">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="fw-bold mb-2">
+                <i class="bi bi-speedometer2"></i> Dashboard - Sistema Hospitalar
+            </h1>
+            <p class="mb-0 fs-5">Bem-vindo! Aqui está um resumo completo do sistema</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <i class="bi bi-hospital fs-1"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Estatísticas Principais -->
+<h3 class="section-title">
+    <i class="bi bi-bar-chart-fill"></i> Estatísticas Gerais
+</h3>
+
+<div class="row g-4 mb-5">
+    <!-- Total Pacientes -->
+    <div class="col-md-4 col-sm-6">
+        <div class="card stat-card card-gradient-primary shadow">
+            <div class="card-body text-center">
+                <i class="bi bi-people-fill stat-icon"></i>
+                <h5 class="mt-3 mb-0">Total de Pacientes</h5>
+                <div class="stat-number">{{ total_pacientes }}</div>
+                <a href="{% url 'paciente_home' %}" class="btn btn-light btn-sm mt-2">
+                    Ver Todos <i class="bi bi-arrow-right"></i>
+                </a>
             </div>
         </div>
-    </nav>
-
-    
-    <div class="container content-wrapper">
-        {% block content %}
-
-        <h2 class="fw-bold mb-4">
-            <i class="bi bi-speedometer2"></i> Dashboard
-        </h2>
-
-    
-        <div class="row g-4">
-
-        
-            <div class="col-md-4">
-                <div class="card shadow-sm border-0">
-                    <div class="card-body text-center">
-                        <i class="bi bi-people-fill text-primary fs-1"></i>
-                        <h5 class="mt-3">Pacientes</h5>
-                        <h2 class="fw-bold">{{ total_pacientes }}</h2>
-                    </div>
-                </div>
-            </div>
-
-        
-            <div class="col-md-4">
-                <div class="card shadow-sm border-0">
-                    <div class="card-body text-center">
-                        <i class="bi bi-person-badge-fill text-success fs-1"></i>
-                        <h5 class="mt-3">Médicos</h5>
-                        <h2 class="fw-bold">{{ total_medicos }}</h2>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card shadow-sm border-0">
-                    <div class="card-body text-center">
-                        <i class="bi bi-calendar2-check-fill text-warning fs-1"></i>
-                        <h5 class="mt-3">Consultas</h5>
-                        <h2 class="fw-bold">{{ total_consultas }}</h2>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <hr class="my-4">
-
-
-        <div class="row g-4">
-
-
-            <div class="col-md-4">
-                <div class="card shadow-sm border-0">
-                    <div class="card-body text-center">
-                        <i class="bi bi-clock-history text-info fs-1"></i>
-                        <h5 class="mt-3">Consultas Agendadas</h5>
-                        <h2 class="fw-bold">{{ consultas_agendadas }}</h2>
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="col-md-4">
-                <div class="card shadow-sm border-0">
-                    <div class="card-body text-center">
-                        <i class="bi bi-check-circle-fill text-success fs-1"></i>
-                        <h5 class="mt-3">Consultas Realizadas</h5>
-                        <h2 class="fw-bold">{{ consultas_realizadas }}</h2>
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="col-md-4">
-                <div class="card shadow-sm border-0">
-                    <div class="card-body text-center">
-                        <i class="bi bi-person-lines-fill text-danger fs-1"></i>
-                        <h5 class="mt-3">Médico(s) com Mais Consultas</h5>
-
-                        <h2 class="fw-bold">
-                            {% for medico in medicos_mais_consultas %}
-                                {{ medico.nome }} ({{ medico.total }} consultas)<br>
-                            {% empty %}
-                                Nenhum
-                            {% endfor %}
-                        </h2>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        {% endblock %}
     </div>
 
-    <footer class="py-3 text-center shadow-lg">
-        <p class="footer-text m-0">
-            &copy; 2025 - Sistema Hospitalar
-        </p>
-    </footer>
+    <!-- Total Médicos -->
+    <div class="col-md-4 col-sm-6">
+        <div class="card stat-card card-gradient-success shadow">
+            <div class="card-body text-center">
+                <i class="bi bi-person-badge-fill stat-icon"></i>
+                <h5 class="mt-3 mb-0">Total de Médicos</h5>
+                <div class="stat-number">{{ total_medicos }}</div>
+                <a href="{% url 'medico_home' %}" class="btn btn-light btn-sm mt-2">
+                    Ver Todos <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Total Consultas -->
+    <div class="col-md-4 col-sm-6">
+        <div class="card stat-card card-gradient-warning shadow">
+            <div class="card-body text-center">
+                <i class="bi bi-calendar2-check-fill stat-icon"></i>
+                <h5 class="mt-3 mb-0">Total de Consultas</h5>
+                <div class="stat-number">{{ total_consultas }}</div>
+                <a href="{% url 'consulta_home' %}" class="btn btn-light btn-sm mt-2">
+                    Ver Todas <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 
-    {% block extra_scripts %}{% endblock %}
-</body>
+<!-- Consultas por Status -->
+<h3 class="section-title">
+    <i class="bi bi-calendar-event"></i> Status das Consultas
+</h3>
 
-</html>
+<div class="row g-4 mb-5">
+    <!-- Consultas de Hoje -->
+    <div class="col-md-3 col-sm-6">
+        <div class="card stat-card shadow-sm">
+            <div class="card-body text-center">
+                <i class="bi bi-calendar-today text-primary stat-icon" style="font-size: 2.5rem;"></i>
+                <h6 class="mt-3 mb-0">Hoje</h6>
+                <div class="stat-number" style="font-size: 2rem;">{{ consultas_hoje }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Consultas deste Mês -->
+    <div class="col-md-3 col-sm-6">
+        <div class="card stat-card shadow-sm">
+            <div class="card-body text-center">
+                <i class="bi bi-calendar-month text-info stat-icon" style="font-size: 2.5rem;"></i>
+                <h6 class="mt-3 mb-0">Este Mês</h6>
+                <div class="stat-number" style="font-size: 2rem;">{{ consulta_mes }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Consultas Agendadas -->
+    <div class="col-md-3 col-sm-6">
+        <div class="card stat-card card-gradient-info shadow">
+            <div class="card-body text-center">
+                <i class="bi bi-clock-history stat-icon" style="font-size: 2.5rem;"></i>
+                <h6 class="mt-3 mb-0">Agendadas</h6>
+                <div class="stat-number" style="font-size: 2rem;">{{ consultas_agendadas }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Consultas Realizadas -->
+    <div class="col-md-3 col-sm-6">
+        <div class="card stat-card card-gradient-secondary shadow">
+            <div class="card-body text-center">
+                <i class="bi bi-check-circle-fill stat-icon" style="font-size: 2.5rem;"></i>
+                <h6 class="mt-3 mb-0">Realizadas</h6>
+                <div class="stat-number" style="font-size: 2rem;">{{ consultas_realizadas }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <!-- Próximas Consultas -->
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-0 pt-4 pb-3">
+                <h4 class="mb-0">
+                    <i class="bi bi-calendar-week text-primary"></i> Próximas Consultas
+                </h4>
+            </div>
+            <div class="card-body">
+                {% if proximas_consultas %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Data/Hora</th>
+                                <th>Paciente</th>
+                                <th>Médico</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for consulta in proximas_consultas %}
+                            <tr>
+                                <td>
+                                    <i class="bi bi-calendar3"></i>
+                                    {{ consulta.data|date:"d/m/Y" }} às {{ consulta.data|date:"H:i" }}
+                                </td>
+                                <td>
+                                    <i class="bi bi-person"></i> {{ consulta.paciente.nome }}
+                                </td>
+                                <td>
+                                    <i class="bi bi-person-badge"></i> {{ consulta.medico.nome }}
+                                </td>
+                                <td>
+                                    {% if consulta.situacao == 'AG' %}
+                                    <span class="badge bg-info badge-custom">Agendada</span>
+                                    {% elif consulta.situacao == 'RE' %}
+                                    <span class="badge bg-success badge-custom">Realizada</span>
+                                    {% else %}
+                                    <span class="badge bg-danger badge-custom">Cancelada</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-calendar-x fs-1"></i>
+                    <p class="mt-3">Nenhuma consulta agendada</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Médicos por Especialidade -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-0 pt-4 pb-3">
+                <h5 class="mb-0">
+                    <i class="bi bi-hospital text-success"></i> Médicos por Especialidade
+                </h5>
+            </div>
+            <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                {% if medicos_por_especialidade %}
+                    {% for item in medicos_por_especialidade %}
+                    <div class="especialidade-item">
+                        <div>
+                            <i class="bi bi-dot text-primary"></i>
+                            <strong>{{ item.especialidade__display }}</strong>
+                        </div>
+                        <span class="badge bg-primary">{{ item.total }}</span>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-inbox fs-1"></i>
+                    <p class="mt-3">Nenhum médico cadastrado</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ações Rápidas -->
+<h3 class="section-title">
+    <i class="bi bi-lightning-fill"></i> Ações Rápidas
+</h3>
+
+<div class="row g-3 mb-5">
+    <div class="col-md-3">
+        <a href="{% url 'criar_paciente' %}" class="btn btn-primary w-100 quick-action-btn">
+            <i class="bi bi-person-plus-fill fs-4 d-block mb-2"></i>
+            Novo Paciente
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{% url 'criar_medico' %}" class="btn btn-success w-100 quick-action-btn">
+            <i class="bi bi-person-badge fs-4 d-block mb-2"></i>
+            Novo Médico
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{% url 'criar_consulta' %}" class="btn btn-warning w-100 quick-action-btn text-white">
+            <i class="bi bi-calendar-plus fs-4 d-block mb-2"></i>
+            Agendar Consulta
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="/admin/" class="btn btn-dark w-100 quick-action-btn">
+            <i class="bi bi-gear-fill fs-4 d-block mb-2"></i>
+            Administração
+        </a>
+    </div>
+</div>
+
+<!-- Resumo Visual -->
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-0 pt-4">
+                <h5 class="mb-0">
+                    <i class="bi bi-graph-up text-primary"></i> Progresso do Sistema
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span><i class="bi bi-people"></i> Pacientes Cadastrados</span>
+                        <strong>{{ total_pacientes }}</strong>
+                    </div>
+                    <div class="progress progress-custom">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: {{ total_pacientes }}%"></div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span><i class="bi bi-person-badge"></i> Médicos Cadastrados</span>
+                        <strong>{{ total_medicos }}</strong>
+                    </div>
+                    <div class="progress progress-custom">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ total_medicos }}%"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span><i class="bi bi-calendar-check"></i> Consultas Realizadas</span>
+                        <strong>{{ consultas_realizadas }}</strong>
+                    </div>
+                    <div class="progress progress-custom">
+                        <div class="progress-bar bg-info" role="progressbar" style="width: {% if total_consultas > 0 %}{{ consultas_realizadas|floatformat:0|add:'0' }}{% else %}0{% endif %}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-0 pt-4">
+                <h5 class="mb-0">
+                    <i class="bi bi-info-circle text-warning"></i> Informações do Sistema
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                    <div>
+                        <i class="bi bi-building text-primary fs-4"></i>
+                        <strong class="ms-2">Sistema Hospitalar</strong>
+                    </div>
+                    <span class="badge bg-success">Online</span>
+                </div>
+
+                <div class="mb-3">
+                    <i class="bi bi-calendar-date text-info"></i>
+                    <strong class="ms-2">Data:</strong>
+                    <span class="float-end">{{ data_atual|date:"d/m/Y" }}</span>
+                </div>
+
+                <div class="mb-3">
+                    <i class="bi bi-clock text-warning"></i>
+                    <strong class="ms-2">Hora:</strong>
+                    <span class="float-end">{{ data_atual|date:"H:i" }}</span>
+                </div>
+
+                <div class="mb-3">
+                    <i class="bi bi-activity text-danger"></i>
+                    <strong class="ms-2">Status:</strong>
+                    <span class="float-end text-success">Operacional</span>
+                </div>
+
+                <div>
+                    <i class="bi bi-database text-secondary"></i>
+                    <strong class="ms-2">Versão:</strong>
+                    <span class="float-end">1.0.0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
