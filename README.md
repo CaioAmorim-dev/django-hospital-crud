@@ -53,6 +53,10 @@ pip install django
 ```
 python manage.py migrate
 ```
+**Criar seed**
+```
+python manage.py seed_database --clear
+```
 **Rodar o servidor**
 ```
 python manage.py runserver
