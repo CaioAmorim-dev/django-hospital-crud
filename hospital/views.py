@@ -3,8 +3,8 @@ from django.db.models import Q
 from django.utils import timezone
 from django.contrib import messages
 from .models import Paciente, Medico, Consulta
-from .models import Paciente, Medico, Consulta
 from .forms import PacienteForm, MedicoForm, ConsultaForm
+from datetime import date
 
 
 # HOME DO SISTEMA 
@@ -49,10 +49,18 @@ def home_paciente(request):
 def criar_paciente(request):
     if request.method == 'POST':
         nome = request.POST.get('nome')
-        idade = request.POST.get('idade')
         contato = request.POST.get('contato')
         cpf = request.POST.get('cpf')
         data_nascimento = request.POST.get('data_nascimento')
+
+        # Validação da data de nascimento
+        if data_nascimento:
+            data_nascimento_obj = date.fromisoformat(data_nascimento)
+            hoje = date.today()
+            
+            if data_nascimento_obj > hoje:
+                messages.error(request, "A data de nascimento não pode ser no futuro!")
+                return redirect('paciente_home')
 
         Paciente.objects.create(
             nome=nome,
@@ -60,8 +68,9 @@ def criar_paciente(request):
             cpf=cpf,
             data_nascimento=data_nascimento
         )
-
-        return redirect('paciente_home')  # volta para a lista
+        
+        messages.success(request, "Paciente criado com sucesso!")
+        return redirect('paciente_home')
 
     return redirect('paciente_home')
 
@@ -70,14 +79,25 @@ def editar_paciente(request, id):
     paciente = get_object_or_404(Paciente, id=id)
 
     if request.method == 'POST':
-        form = PacienteForm(request.POST, instance=paciente)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Paciente atualizado com sucesso!")
-            return redirect('paciente_home')
-        else:
-            messages.error(request, "Erro ao atualizar paciente. Verifique os dados.")
-            return redirect('paciente_home')
+        paciente.nome = request.POST.get('nome')
+        paciente.contato = request.POST.get('contato')
+        paciente.cpf = request.POST.get('cpf')
+        data_nascimento = request.POST.get('data_nascimento')
+        
+        # Validação da data de nascimento
+        if data_nascimento:
+            data_nascimento_obj = date.fromisoformat(data_nascimento)
+            hoje = date.today()
+            
+            if data_nascimento_obj > hoje:
+                messages.error(request, "A data de nascimento não pode ser no futuro!")
+                return redirect('paciente_home')
+            
+            paciente.data_nascimento = data_nascimento
+        
+        paciente.save()
+        messages.success(request, "Paciente atualizado com sucesso!")
+        return redirect('paciente_home')
 
     return redirect('paciente_home')
 
@@ -115,14 +135,20 @@ def home_medico(request):
 
 def criar_medico(request):
     if request.method == 'POST':
-        form = MedicoForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Médico criado com sucesso!")
-            return redirect('medico_home')
-        else:
-            messages.error(request, "Erro ao criar médico. Verifique os dados.")
-            return redirect('medico_home')
+        nome = request.POST.get('nome')
+        especialidade = request.POST.get('especialidade')
+        crm = request.POST.get('crm')
+        contato = request.POST.get('contato', '')
+        cpf = request.POST.get('cpf')
+        
+        Medico.objects.create(
+            nome=nome,
+            especialidade=especialidade,
+            crm=crm,
+            cpf=cpf
+        )
+        messages.success(request, "Médico criado com sucesso!")
+        return redirect('medico_home')
 
     return redirect('medico_home')
 
@@ -131,16 +157,14 @@ def editar_medico(request, medico_id):
     medico = get_object_or_404(Medico, id=medico_id)
 
     if request.method == 'POST':
-        form = MedicoForm(request.POST, instance=medico)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Médico atualizado com sucesso!")
-            return redirect('medico_home')
-        else:
-            messages.error(request, "Erro ao atualizar médico. Verifique os dados.")
-            return redirect('medico_home')
-    else:
-        form = MedicoForm(instance=medico)
+        medico.nome = request.POST.get('nome')
+        medico.especialidade = request.POST.get('especialidade')
+        medico.crm = request.POST.get('crm')
+        medico.cpf = request.POST.get('cpf')
+        
+        medico.save()
+        messages.success(request, "Médico atualizado com sucesso!")
+        return redirect('medico_home')
 
     return redirect('medico_home')
 
@@ -179,7 +203,8 @@ def criar_consulta(request):
             data=data,
             situacao=situacao
         )
-
+        
+        messages.success(request, "Consulta criada com sucesso!")
         return redirect("consulta_home")
 
     return redirect("consulta_home")
@@ -194,14 +219,23 @@ def editar_consulta(request, id):
         return redirect("consulta_home")
 
     if request.method == 'POST':
-        form = ConsultaForm(request.POST, instance=consulta)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Consulta atualizada com sucesso!")
-            return redirect('consulta_home')
-        else:
-            messages.error(request, "Erro ao atualizar consulta. Verifique os dados.")
-            return redirect('consulta_home')
+        cpf_paciente = request.POST.get("cpf_paciente")
+        cpf_medico = request.POST.get("cpf_medico")
+        data = request.POST.get("data")
+        situacao = request.POST.get("situacao")
+        
+        if cpf_paciente:
+            consulta.paciente = get_object_or_404(Paciente, cpf=cpf_paciente)
+        if cpf_medico:
+            consulta.medico = get_object_or_404(Medico, cpf=cpf_medico)
+        if data:
+            consulta.data = data
+        if situacao:
+            consulta.situacao = situacao
+        
+        consulta.save()
+        messages.success(request, "Consulta atualizada com sucesso!")
+        return redirect('consulta_home')
 
     return redirect('consulta_home')
 
@@ -210,49 +244,12 @@ def cancelar_consulta(request, id):
     consulta = get_object_or_404(Consulta, id=id)
 
     if request.method == "POST":
-        consulta.situacao = "CA"  # Cancelada
+        consulta.situacao = "CA"
         consulta.save()
+        messages.success(request, "Consulta cancelada com sucesso!")
         return redirect("consulta_home")
 
     return redirect("consulta_home")
-
-# FILTRO PACIENTE
-
-def home_paciente(request):
-    termo = request.GET.get('q', '')  # Termo de pesquisa geral
-    data_nascimento_inicio = request.GET.get('data_nascimento_inicio', '')
-    data_nascimento_fim = request.GET.get('data_nascimento_fim', '')
-    contato = request.GET.get('contato', '')
-
-    # Inicia a consulta, buscando todos os pacientes
-    pacientes = Paciente.objects.all()
-
-    # Filtro por nome, CPF e telefone
-    if termo:
-        pacientes = pacientes.filter(
-            Q(nome__icontains=termo) |
-            Q(cpf__icontains=termo) |
-            Q(contato__icontains=termo)
-        )
-
-    # Filtro por data de nascimento (intervalo)
-    if data_nascimento_inicio:
-        pacientes = pacientes.filter(data_nascimento__gte=data_nascimento_inicio)
-    if data_nascimento_fim:
-        pacientes = pacientes.filter(data_nascimento__lte=data_nascimento_fim)
-
-    # Filtro por contato (telefone ou e-mail)
-    if contato:
-        pacientes = pacientes.filter(contato__icontains=contato)
-
-    # Passando o filtro de termo e a lista de pacientes para o Template
-    return render(request, 'paciente/home_paciente.html', {
-        'termo': termo,
-        'data_nascimento_inicio': data_nascimento_inicio,
-        'data_nascimento_fim': data_nascimento_fim,
-        'contato': contato,
-        'pacientes': pacientes
-    })
 
 
 
