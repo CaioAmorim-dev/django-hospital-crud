@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<!-- Exibição de mensagens -->
+
 {% if messages %}
 <div class="mt-3">
     {% for message in messages %}
@@ -31,16 +31,16 @@
 <h2>Consultas</h2>
 <p>Bem-vindo à área de consultas. Aqui você pode visualizar e gerenciar consultas.</p>
 
-<!-- BOTÃO DE CRIAR CONSULTA -->
+
 <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#modalCriarConsulta">
     Criar Consulta
 </button>
 
-<!-- FORMULÁRIO DE FILTRO -->
+
 <form method="get">
     <input type="text" name="q" placeholder="Pesquisar por Paciente, Medico, Data..." value="{{ termo }}" class="form-control mb-3">
 
-    <!-- Filtro de Intervalo de Data -->
+
  
     <div class="row mb-3">
         <div class="col">
@@ -58,7 +58,7 @@
 
 <hr>
 
-<!-- TABELA DE CONSULTAS -->
+
 <div class="card shadow-sm">
     <div class="card-body">
         <table class="table table-striped">
@@ -83,7 +83,7 @@
                     <td>{{ consulta.data|date:"d/m/Y" }}</td>
                     <td>{{ consulta.data|time:"H:i" }}</td>
 
-                    <!-- STATUS -->
+                    
                     <td>
                         {% if consulta.situacao == "AG" %}
                             <span class="badge bg-primary">Agendada</span>
@@ -94,7 +94,7 @@
                         {% endif %}
                     </td>
 
-                    <!-- AÇÕES -->
+                    
                     <td>
                         <button class="btn btn-warning btn-sm" data-bs-toggle="modal" 
                                 data-bs-target="#modalEditarConsulta{{ consulta.id }}">
@@ -120,7 +120,7 @@
 </div>
 
 
-<!-- MODAL CRIAR CONSULTA -->
+
 <div class="modal fade" id="modalCriarConsulta" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -175,9 +175,9 @@
 </div>
 
 
-<!-- Modais de Editar e Cancelar para cada consulta -->
+
 {% for consulta in consultas %}
-<!-- Modal Editar Consulta -->
+
 <div class="modal fade" id="modalEditarConsulta{{ consulta.id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -219,7 +219,7 @@
     </div>
 </div>
 
-<!-- Modal Cancelar Consulta -->
+
 <div class="modal fade" id="modalCancelarConsulta{{ consulta.id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">

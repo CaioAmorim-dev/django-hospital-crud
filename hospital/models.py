@@ -14,13 +14,11 @@ class Paciente(models.Model):
         return self.nome
 
     def save(self, *args, **kwargs):
-        # Se vier string, converte para date
         if isinstance(self.data_nascimento, str):
             self.data_nascimento = datetime.strptime(
                 self.data_nascimento, "%Y-%m-%d"
             ).date()
 
-        # Calcula idade
         hoje = date.today()
         self.idade = hoje.year - self.data_nascimento.year - (
             (hoje.month, hoje.day) < (self.data_nascimento.month, self.data_nascimento.day)

@@ -8,7 +8,7 @@ from datetime import date
 class PacienteForm(forms.ModelForm):
     class Meta:
         model = Paciente
-        # PACIENTE TEM: nome, idade, contato, cpf, data_nascimento
+        
         fields = ["nome", "idade", "contato", "cpf", "data_nascimento"]
         widgets = {
             'nome': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Digite o nome do paciente'}),
@@ -24,14 +24,14 @@ class PacienteForm(forms.ModelForm):
         if not contato:
             raise ValidationError("Contato é obrigatório.")
         
-        # Remove qualquer caractere que não seja número
+        
         contato_limpo = re.sub(r'\D', '', str(contato))
 
-        # só aceita dígitos, de 8 a 15
+        
         if not re.fullmatch(r'\d{8,15}', contato_limpo):
             raise ValidationError("Telefone inválido. Digite apenas números (8 a 15 dígitos).")
 
-        # valida duplicidade de contato
+        
         if Paciente.objects.filter(contato=contato_limpo).exclude(id=self.instance.id).exists():
             raise ValidationError("Este telefone já está cadastrado para outro paciente.")
 
@@ -77,7 +77,7 @@ class PacienteForm(forms.ModelForm):
 class MedicoForm(forms.ModelForm):
     class Meta:
         model = Medico
-        # MODELO TEM: nome, especialidade, crm, cpf
+        
         fields = ['nome', 'especialidade', 'crm', 'cpf']
         widgets = {
             'nome': forms.TextInput(attrs={'class': 'form-control','placeholder': 'Nome do médico'}),
@@ -92,7 +92,7 @@ class MedicoForm(forms.ModelForm):
         if not crm:
             raise ValidationError("CRM é obrigatório.")
 
-        # exemplo simples: só dígitos e letras, mínimo 4 caracteres
+        
         if not re.fullmatch(r'[A-Za-z0-9]{4,20}', str(crm)):
             raise ValidationError("CRM inválido. Use somente letras e números (4 a 20 caracteres).")
 
@@ -134,7 +134,7 @@ class ConsultaForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Se estamos editando uma consulta existente, preencher os campos CPF
+        
         if self.instance and self.instance.pk:
             self.fields['cpf_paciente'].initial = self.instance.paciente.cpf
             self.fields['cpf_medico'].initial = self.instance.medico.cpf
@@ -185,7 +185,7 @@ class ConsultaForm(forms.ModelForm):
         if not data:
             raise ValidationError("A data da consulta é obrigatória.")
 
-        # Apenas bloquear data no passado ao criar nova consulta (não ao editar)
+        
         if not self.instance.pk and data < timezone.now():
             raise ValidationError("A data da consulta não pode ser no passado.")
 

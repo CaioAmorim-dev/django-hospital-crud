@@ -3,7 +3,7 @@
 {% block title %} Pacientes - Sistema Hospitalar {% endblock %}
 
 {% block content %}
-<!-- Exibição de mensagens -->
+
 {% if messages %}
 <div class="mt-3">
     {% for message in messages %}
@@ -30,17 +30,17 @@
 <h2>Área do Paciente</h2>
 <p>Bem-vindo à área do paciente. Aqui você pode visualizar e gerenciar suas informações médicas.</p>
 
-<!-- BOTÃO DE CRIAR PACIENTE -->
+
 <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#modalCriarPaciente">
     Criar Paciente
 </button>
 
-<!-- FILTRO PACIENTE -->
+
 <form method="get">
-    <!-- Campo de pesquisa por Nome, CPF, Telefone -->
+    
     <input type="text" name="q" placeholder="Pesquisar por nome, CPF, etc." value="{{ termo }}" class="form-control mb-3">
 
-    <!-- Filtros adicionais -->
+    
     <div class="row mb-3">
         <div class="col">
             <input type="date" name="data_nascimento" value="{{ data_nascimento }}" class="form-control" placeholder="Data Nascimento">
@@ -53,7 +53,7 @@
 
 <hr>
 
-<!-- TABELA DE PACIENTES -->
+
 <div class="card shadow-sm">
     <div class="card-body">
         <table class="table table-striped">
@@ -100,7 +100,7 @@
     </div>
 </div>
 
-<!-- Modal Criar Paciente -->
+
 <div class="modal fade" id="modalCriarPaciente" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -146,9 +146,9 @@
     </div>
 </div>
 
-<!-- Modais de Editar e Excluir para cada paciente -->
+
 {% for paciente in pacientes %}
-<!-- Modal Editar Paciente -->
+
 <div class="modal fade" id="modalEditarPaciente{{ paciente.id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -185,7 +185,7 @@
     </div>
 </div>
 
-<!-- Modal Excluir Paciente -->
+
 <div class="modal fade" id="modalExcluirPaciente{{ paciente.id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">

@@ -3,18 +3,18 @@ from .models import Paciente, Medico, Consulta
 from django import forms
 from django.forms import DateInput
 
-# Filtro para Paciente
+
 class PacienteAdmin(admin.ModelAdmin):
     list_display = ('nome', 'cpf', 'data_nascimento')
     search_fields = ('nome', 'cpf')
-    list_filter = ('data_nascimento',)  # Filtro por data de nascimento
+    list_filter = ('data_nascimento',)  
     fieldsets = (
         (None, {
             'fields': ('nome', 'cpf', 'data_nascimento')
         }),
     )
 
-# Filtro para Médico
+
 class MedicoAdmin(admin.ModelAdmin):
     list_display = ('nome', 'cpf', 'especialidade', 'crm')
     search_fields = ('nome', 'cpf', 'especialidade', 'crm')
@@ -25,7 +25,7 @@ class MedicoAdmin(admin.ModelAdmin):
         }),
     )
 
-# Filtro para Consulta
+
 class ConsultaAdmin(admin.ModelAdmin):
     list_display = ('paciente', 'medico', 'data', 'situacao')
     search_fields = ('paciente__nome', 'medico__nome')
@@ -36,7 +36,7 @@ class ConsultaAdmin(admin.ModelAdmin):
         }),
     )
 
-# Registrando os modelos no admin
+
 admin.site.register(Paciente, PacienteAdmin)
 admin.site.register(Medico, MedicoAdmin)
 admin.site.register(Consulta, ConsultaAdmin)
