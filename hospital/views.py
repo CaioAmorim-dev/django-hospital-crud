@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.utils import timezone
 from django.contrib import messages
 from .models import Paciente, Medico, Consulta
@@ -10,18 +10,47 @@ from datetime import date
 # HOME DO SISTEMA 
 
 def home(request):
-    hoje= timezone.now().date()
+    hoje = timezone.now().date()
     agora = timezone.now()
 
-    contexto = {
-        "total_pacientes" : Paciente.objects.count(),
-        "total_medicos" : Medico.objects.count(),
-        "total_consultas" : Consulta.objects.count(),
-        "consultas_hoje": Consulta.objects.filter(data__date=hoje).count(),
-        "consulta_mes" : Consulta.objects.filter(data__year=agora.year, data__month=agora.month).count(),
-        "proximas_consultas" : Consulta.objects.filter(data__gte=agora).order_by('data')[:5],
-        }
+    # Estatísticas gerais
+    total_pacientes = Paciente.objects.count()
+    total_medicos = Medico.objects.count()
+    total_consultas = Consulta.objects.count()
     
+    # Consultas por período
+    consultas_hoje = Consulta.objects.filter(data__date=hoje).count()
+    consulta_mes = Consulta.objects.filter(data__year=agora.year, data__month=agora.month).count()
+    
+    # Consultas por status
+    consultas_agendadas = Consulta.objects.filter(situacao='AG').count()
+    consultas_realizadas = Consulta.objects.filter(situacao='RE').count()
+    
+    # Próximas consultas
+    proximas_consultas = Consulta.objects.filter(data__gte=agora).order_by('data')[:5]
+    
+    # Médicos por especialidade
+    medicos_por_especialidade = Medico.objects.values('especialidade').annotate(
+        total=Count('id')
+    ).order_by('-total')
+    
+    # Adiciona o display name para cada especialidade
+    for item in medicos_por_especialidade:
+        especialidade_dict = dict(Medico.ESPECIALIDADE_CHOICES)
+        item['especialidade__display'] = especialidade_dict.get(item['especialidade'], item['especialidade'])
+
+    contexto = {
+        "total_pacientes": total_pacientes,
+        "total_medicos": total_medicos,
+        "total_consultas": total_consultas,
+        "consultas_hoje": consultas_hoje,
+        "consulta_mes": consulta_mes,
+        "consultas_agendadas": consultas_agendadas,
+        "consultas_realizadas": consultas_realizadas,
+        "proximas_consultas": proximas_consultas,
+        "medicos_por_especialidade": medicos_por_especialidade,
+        "data_atual": agora,
+    }
 
     return render(request, 'home.html', contexto)
 
