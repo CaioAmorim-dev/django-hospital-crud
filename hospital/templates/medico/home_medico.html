@@ -3,6 +3,30 @@
 {% block title %} Médicos - Sistema Hospitalar {% endblock %}
 
 {% block content %}
+<!-- Exibição de mensagens -->
+{% if messages %}
+<div class="mt-3">
+    {% for message in messages %}
+        {% if message.tags == 'success' %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% elif message.tags == 'error' %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% else %}
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>
+{% endif %}
+
 <h2>Área do Médico</h2>
 <p>Bem-vindo à área do médico. Aqui você pode visualizar e gerenciar as informações dos médicos.</p>
 
